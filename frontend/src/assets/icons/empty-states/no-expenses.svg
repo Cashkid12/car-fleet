@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" fill="none">
+  <rect x="45" y="30" width="110" height="140" rx="8" stroke="#14B8A6" stroke-width="3" opacity="0.5"/>
+  <circle cx="100" cy="75" r="25" stroke="#14B8A6" stroke-width="3" opacity="0.3"/>
+  <path d="M82 75h36M100 57v36" stroke="#14B8A6" stroke-width="3" opacity="0.3"/>
+  <line x1="60" y1="130" x2="140" y2="130" stroke="#14B8A6" stroke-width="2" opacity="0.3"/>
+  <line x1="60" y1="145" x2="130" y2="145" stroke="#14B8A6" stroke-width="2" opacity="0.3"/>
+  <text x="100" y="188" text-anchor="middle" fill="#9CA3AF" font-size="14" font-family="sans-serif">No expenses recorded</text>
+</svg>

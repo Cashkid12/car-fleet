@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#111827"/>
+  <!-- Decorative circles -->
+  <circle cx="950" cy="315" r="200" fill="#14B8A6" opacity="0.08"/>
+  <circle cx="950" cy="315" r="140" fill="#14B8A6" opacity="0.05"/>
+  <!-- Car icon left side -->
+  <g transform="translate(250, 315)" fill="none" stroke="#14B8A6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="-80" y="-40" width="160" height="80" rx="16"/>
+    <circle cx="-55" cy="45" r="20"/>
+    <circle cx="55" cy="45" r="20"/>
+    <rect x="-60" y="-58" width="120" height="26" rx="13"/>
+    <line x1="-45" y1="-40" x2="-45" y2="-58"/>
+    <line x1="45" y1="-40" x2="45" y2="-58"/>
+  </g>
+  <!-- Text right side -->
+  <text x="540" y="280" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="64" font-weight="bold">Fleet Manager</text>
+  <text x="540" y="340" fill="#14B8A6" font-family="Arial, sans-serif" font-size="32">Track your fleet. Know your profit.</text>
+</svg>
