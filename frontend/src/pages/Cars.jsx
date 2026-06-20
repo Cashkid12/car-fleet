@@ -88,7 +88,7 @@ export default function Cars() {
   if (loading) return <LoadingSpinner className="min-h-screen" />
 
   return (
-    <div className="px-4 py-6 lg:px-8 page-enter max-w-lg mx-auto">
+    <div className="px-4 py-6 lg:px-8 page-enter max-w-lg mx-auto pb-24">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-text-primary">My Cars</h1>
@@ -96,18 +96,27 @@ export default function Cars() {
         </div>
         <button
           onClick={() => { resetForm(); setShowForm(true) }}
-          className="bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-xl h-11 px-4 text-sm flex items-center gap-1.5 transition-colors duration-150 shadow-lg shadow-teal-500/15"
+          className="bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white font-semibold rounded-xl h-11 px-4 text-sm flex items-center gap-1.5 transition-colors duration-150 shadow-lg shadow-teal-500/15 flex-shrink-0"
         >
           <HiOutlinePlus size={18} />
-          Add Car
+          <span className="hidden sm:inline">Add Car</span>
         </button>
       </div>
 
       {/* Add/Edit Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center" onClick={resetForm}>
-          <div className="bg-bg-card rounded-t-2xl sm:rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/40" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold text-text-primary mb-5">{editingCar ? 'Edit Car' : 'Add New Car'}</h3>
+          <div className="bg-bg-card rounded-t-2xl sm:rounded-2xl w-full max-w-md p-6 max-h-[85vh] overflow-y-auto shadow-2xl shadow-black/40" onClick={(e) => e.stopPropagation()} style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-xl font-bold text-text-primary">{editingCar ? 'Edit Car' : 'Add New Car'}</h3>
+              <button
+                type="button"
+                onClick={resetForm}
+                className="w-8 h-8 rounded-full bg-border-subtle flex items-center justify-center text-text-muted hover:text-text-primary transition-colors duration-150"
+              >
+                ✕
+              </button>
+            </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className={labelClass}>Plate Number</label>
@@ -118,6 +127,7 @@ export default function Cars() {
                   className={formInputClass}
                   placeholder="KDA 123T"
                   required
+                  autoFocus
                 />
               </div>
               <div>
