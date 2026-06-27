@@ -7,10 +7,15 @@ exports.addIncome = async (req, res) => {
     
     if (!car) return res.status(404).json({ message: 'Car not found' });
     
-    car.incomeHistory.push({ date, amount, note });
-    await car.save();
+    car.incomeHistory.push({
+      date: date || new Date(),
+      amount,
+      note: note || '',
+      recordedAt: new Date()
+    });
     
-    res.json(car);
+    await car.save();
+    res.status(201).json(car);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -20,7 +25,9 @@ exports.getIncome = async (req, res) => {
   try {
     const car = await Car.findOne({ _id: req.params.id, clerkUserId: req.auth.userId });
     if (!car) return res.status(404).json({ message: 'Car not found' });
-    res.json(car.incomeHistory);
+    
+    const sorted = [...car.incomeHistory].sort((a, b) => new Date(b.date) - new Date(a.date));
+    res.json(sorted);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -37,7 +44,8 @@ exports.getIncomeRange = async (req, res) => {
       return (!start || d >= new Date(start)) && (!end || d <= new Date(end));
     });
     
-    res.json(filtered);
+    const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+    res.json(sorted);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

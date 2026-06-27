@@ -71,8 +71,4 @@ const carSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// Index for faster queries
-carSchema.index({ clerkUserId: 1 });
-carSchema.index({ plateNumber: 1 });
-
 module.exports = mongoose.model('Car', carSchema);

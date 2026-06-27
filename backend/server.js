@@ -11,12 +11,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Health check — NOT protected
+// Health check — public
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Protect all /api routes with Clerk
+// Protect all /api routes
 app.use('/api', requireAuth());
 
 // Routes

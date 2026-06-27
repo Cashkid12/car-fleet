@@ -23,8 +23,8 @@ export default function AddIncome() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!selectedCar) { addToast('Please select a car', 'error'); return }
-    if (!amount || Number(amount) <= 0) { addToast('Please enter a valid amount', 'error'); return }
+    if (!selectedCar) { addToast('Select a car first', 'error'); return }
+    if (!amount || Number(amount) <= 0) { addToast('Enter a valid amount', 'error'); return }
     setLoading(true)
     try {
       await api.post(`/cars/${selectedCar}/income`, {
@@ -32,7 +32,7 @@ export default function AddIncome() {
         amount: Number(amount),
         note
       })
-      addToast('Income recorded successfully!', 'success')
+      addToast('Income recorded!', 'success')
       setAmount('')
       setNote('')
       setDate(new Date().toISOString().split('T')[0])
@@ -43,30 +43,31 @@ export default function AddIncome() {
     }
   }
 
-  const labelClass = 'text-xs text-text-muted uppercase tracking-wider font-medium mb-2 block'
-  const fieldGroup = 'mb-5'
+  const inputClass = 'w-full bg-[#1A2332] text-white rounded-xl pl-11 pr-4 h-12 border border-[#2A3441] focus:border-teal-500 focus:outline-none text-[15px] transition-colors duration-150'
+  const labelClass = 'text-[11px] text-text-muted uppercase tracking-wider font-semibold mb-2 block'
 
   return (
-    <div className="px-4 py-6 lg:px-8 page-enter max-w-lg mx-auto">
+    <div className="px-4 py-5 page-enter pb-24 max-w-lg mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-text-primary">Add Income</h1>
-        <p className="text-text-secondary text-sm mt-0.5">Record daily collection from a driver</p>
+        <h1 className="text-[22px] font-bold text-white">Add Income</h1>
+        <p className="text-text-secondary text-[13px] mt-0.5">Record daily driver collection</p>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className={fieldGroup}>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Car Select */}
+        <div>
           <label className={labelClass}>Select Car</label>
           <div className="relative">
-            <HiOutlineTruck size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
+            <HiOutlineTruck size={19} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
             <select
               value={selectedCar}
               onChange={(e) => setSelectedCar(e.target.value)}
-              className="w-full bg-bg-card text-text-primary rounded-xl pl-11 pr-4 h-12 border border-border-subtle focus:border-teal-500 focus:outline-none text-base appearance-none transition-colors duration-150"
+              className={`${inputClass} appearance-none`}
               required
             >
-              <option value="" className="bg-bg-card">Choose a car...</option>
+              <option value="" className="bg-[#1A2332]">Choose a car...</option>
               {cars.map(car => (
-                <option key={car._id} value={car._id} className="bg-bg-card">
+                <option key={car._id} value={car._id} className="bg-[#1A2332]">
                   {car.plateNumber} — {car.driverName}
                 </option>
               ))}
@@ -74,29 +75,31 @@ export default function AddIncome() {
           </div>
         </div>
 
-        <div className={fieldGroup}>
+        {/* Date */}
+        <div>
           <label className={labelClass}>Date</label>
           <div className="relative">
-            <HiOutlineCalendarDays size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
+            <HiOutlineCalendarDays size={19} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-bg-card text-text-primary rounded-xl pl-11 pr-4 h-12 border border-border-subtle focus:border-teal-500 focus:outline-none text-base transition-colors duration-150"
+              className={inputClass}
               required
             />
           </div>
         </div>
 
-        <div className={fieldGroup}>
-          <label className={labelClass}>Amount Received (KES)</label>
+        {/* Amount */}
+        <div>
+          <label className={labelClass}>Amount (KES)</label>
           <div className="relative">
-            <HiOutlineBanknotes size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
+            <HiOutlineBanknotes size={19} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
             <input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full bg-bg-card text-text-primary rounded-xl pl-11 pr-4 h-14 border border-border-subtle focus:border-teal-500 focus:outline-none text-2xl font-mono font-bold text-center transition-colors duration-150"
+              className="w-full bg-[#1A2332] text-white rounded-xl pl-11 pr-4 h-14 border border-[#2A3441] focus:border-teal-500 focus:outline-none text-2xl font-mono font-bold text-center transition-colors duration-150"
               placeholder="0"
               required
               min="0"
@@ -104,15 +107,16 @@ export default function AddIncome() {
           </div>
         </div>
 
-        <div className={fieldGroup}>
+        {/* Note */}
+        <div>
           <label className={labelClass}>Note (optional)</label>
           <div className="relative">
-            <HiOutlinePencilSquare size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
+            <HiOutlinePencilSquare size={19} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
             <input
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full bg-bg-card text-text-primary rounded-xl pl-11 pr-4 h-12 border border-border-subtle focus:border-teal-500 focus:outline-none text-base transition-colors duration-150"
+              className={inputClass}
               placeholder="e.g., Morning collection"
             />
           </div>
@@ -121,7 +125,7 @@ export default function AddIncome() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white font-semibold rounded-xl h-14 text-base transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-teal-500/15 mt-8"
+          className="w-full bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white font-semibold rounded-xl h-14 text-[15px] transition-colors duration-150 disabled:opacity-50 mt-8 shadow-lg shadow-teal-500/10"
         >
           {loading ? 'Saving...' : 'Save Income'}
         </button>

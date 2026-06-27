@@ -3,7 +3,6 @@ const Car = require('../models/Car');
 exports.getSummary = async (req, res) => {
   try {
     const cars = await Car.find({ clerkUserId: req.auth.userId });
-    
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     
@@ -24,15 +23,12 @@ exports.getSummary = async (req, res) => {
         .reduce((s, e) => s + e.cost, 0);
     });
     
-    const activeCars = cars.length;
-    const damagedCars = cars.filter(c => c.damageHistory.some(d => d.status === 'still damaged')).length;
-    
     res.json({
       incomeThisMonth,
       expensesThisMonth,
       profitThisMonth: incomeThisMonth - expensesThisMonth,
-      activeCars,
-      damagedCars
+      activeCars: cars.length,
+      damagedCars: cars.filter(c => c.damageHistory.some(d => d.status === 'still damaged')).length
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
