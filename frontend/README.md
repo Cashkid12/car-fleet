@@ -1,16 +1,40 @@
-# React + Vite
+# Fleet Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A premium mobile-first fleet management PWA built for car fleet owners in Kenya.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- 📊 **Dashboard** — Fleet summary, statistics, quick actions, recent activity
+- 🚗 **Fleet Management** — Add, edit, delete vehicles with driver details
+- 💰 **Income Tracking** — Record daily driver collections with reference numbers
+- 🔧 **Damage & Repairs** — Report damages, track repair status
+- 💸 **Expense Management** — Log fuel, maintenance, insurance, and other costs
+- 📈 **Reports & Analytics** — Profit charts, expense breakdowns, vehicle rankings, business insights
+- 🔔 **Smart Notifications** — Auto-generated notifications for every action
+- ⚙️ **Account & Settings** — Theme, font size, layout, currency, notification preferences
+- 📱 **PWA** — Installable on phone, works offline, auto-syncs when back online
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React + Vite, Tailwind CSS, React Router, Recharts, Dexie.js |
+| Backend | Node.js, Express, MongoDB, Mongoose |
+| Auth | Clerk |
+| PWA | vite-plugin-pwa, Workbox |
+| Hosting | Vercel (frontend), Render (backend), MongoDB Atlas |
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- Node.js 18+
+- MongoDB Atlas account
+- Clerk account
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/Cashkid12/car-fleet.git
+cd car-fleet

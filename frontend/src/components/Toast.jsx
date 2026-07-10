@@ -3,23 +3,9 @@ import { HiOutlineCheckCircle, HiOutlineXCircle, HiOutlineExclamationTriangle } 
 
 const ToastContext = createContext(null)
 
-const iconMap = {
-  success: HiOutlineCheckCircle,
-  error: HiOutlineXCircle,
-  info: HiOutlineExclamationTriangle,
-}
-
-const borderMap = {
-  success: 'border-l-teal-500',
-  error: 'border-l-danger',
-  info: 'border-l-warning',
-}
-
-const iconColorMap = {
-  success: 'text-teal-500',
-  error: 'text-danger',
-  info: 'text-warning',
-}
+const iconMap = { success: HiOutlineCheckCircle, error: HiOutlineXCircle, info: HiOutlineExclamationTriangle }
+const borderMap = { success: 'border-l-teal-500', error: 'border-l-danger', info: 'border-l-warning' }
+const iconColorMap = { success: 'text-teal-500', error: 'text-danger', info: 'text-warning' }
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([])
@@ -27,9 +13,7 @@ export function ToastProvider({ children }) {
   const addToast = useCallback((message, type = 'success') => {
     const id = Date.now()
     setToasts(prev => [...prev, { id, message, type }])
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id))
-    }, 3000)
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000)
   }, [])
 
   return (
@@ -39,10 +23,7 @@ export function ToastProvider({ children }) {
         {toasts.map(toast => {
           const Icon = iconMap[toast.type] || iconMap.info
           return (
-            <div
-              key={toast.id}
-              className={`toast-enter px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium pointer-events-auto flex items-center gap-2.5 bg-bg-card border-l-4 ${borderMap[toast.type] || borderMap.info}`}
-            >
+            <div key={toast.id} className={`toast-enter px-4 py-3.5 rounded-2xl shadow-2xl text-white text-[14px] font-medium pointer-events-auto flex items-center gap-2.5 bg-[#1A2332] border-l-4 ${borderMap[toast.type] || borderMap.info} border border-white/5`}>
               <Icon size={20} className={iconColorMap[toast.type] || iconColorMap.info} />
               {toast.message}
             </div>
@@ -59,6 +40,4 @@ export function useToast() {
   return context
 }
 
-export default function Toast() {
-  return null
-}
+export default function Toast() { return null }
