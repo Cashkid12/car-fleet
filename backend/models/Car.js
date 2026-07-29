@@ -14,7 +14,7 @@ const damageEntrySchema = new mongoose.Schema({
   date: { type: Date, required: true, default: Date.now },
   damageType: { type: String, required: true },
   description: { type: String, default: '' },
-  estimatedCost: { type: Number, required: true, min: 0 },
+  estimatedCost: { type: Number, default: 0, min: 0 },
   actualCost: { type: Number, default: null },
   status: { type: String, enum: ['reported', 'in_progress', 'fixed'], default: 'reported' },
   driverAtFault: { type: Boolean, default: false },
