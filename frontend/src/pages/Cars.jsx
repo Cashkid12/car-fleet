@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+iimport { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import { useToast } from '../components/Toast'
 import { formatCurrency } from '../utils/formatters'
@@ -12,7 +13,6 @@ import {
   HiOutlineUsers,
   HiOutlineTruck,
   HiOutlineMagnifyingGlass,
-  HiOutlineFunnel,
   HiOutlineXMark,
   HiOutlineChevronRight
 } from 'react-icons/hi2'
@@ -36,6 +36,7 @@ export default function Cars() {
   const [search, setSearch] = useState('')
   const [activeFilter, setActiveFilter] = useState('all')
   const { addToast } = useToast()
+  const navigate = useNavigate()
 
   const fetchCars = async () => {
     try {
@@ -108,7 +109,6 @@ export default function Cars() {
   const formInputClass = 'w-full bg-[#0B1120] text-white rounded-2xl pl-12 pr-4 h-[56px] border border-white/5 focus:border-teal-500 focus:outline-none text-[15px] transition-all duration-200'
   const labelClass = 'text-[12px] text-[#64748B] uppercase tracking-widest font-semibold mb-2 block'
 
-  // Fleet summary
   const totalCars = cars.length
   const healthyCars = cars.filter(c => c.status === 'healthy').length
   const damagedCars = cars.filter(c => c.status === 'damaged').length
@@ -130,7 +130,7 @@ export default function Cars() {
 
   return (
     <div className="page-enter">
-      {/* ===== HEADER ===== */}
+      {/* Header */}
       <div className="flex items-center justify-between mb-1">
         <div>
           <h1 className="text-[28px] font-bold text-white tracking-tight">My Fleet</h1>
@@ -145,7 +145,7 @@ export default function Cars() {
         </button>
       </div>
 
-      {/* ===== SEARCH BAR ===== */}
+      {/* Search Bar */}
       <div className="relative mb-4 mt-6">
         <HiOutlineMagnifyingGlass size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
         <input
@@ -156,25 +156,20 @@ export default function Cars() {
           className="w-full bg-[#1A2332] text-white rounded-2xl pl-12 pr-12 h-[56px] border border-white/5 focus:border-teal-500 focus:outline-none text-[15px] placeholder-[#64748B] transition-all duration-200"
         />
         {search && (
-          <button
-            onClick={() => setSearch('')}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-white transition-colors duration-150"
-          >
+          <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-white transition-colors duration-150">
             <HiOutlineXMark size={18} />
           </button>
         )}
       </div>
 
-      {/* ===== FILTER PILLS ===== */}
-      <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-hide pb-1">
+      {/* Filter Pills */}
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
         {FILTERS.map(filter => (
           <button
             key={filter.key}
             onClick={() => setActiveFilter(filter.key)}
             className={`flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-semibold transition-all duration-200 ${
-              activeFilter === filter.key
-                ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/20'
-                : 'bg-[#1A2332] text-[#94A3B8] border border-white/5 hover:text-white'
+              activeFilter === filter.key ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/20' : 'bg-[#1A2332] text-[#94A3B8] border border-white/5'
             }`}
           >
             {filter.label}
@@ -182,7 +177,7 @@ export default function Cars() {
         ))}
       </div>
 
-      {/* ===== FLEET SUMMARY ===== */}
+      {/* Fleet Summary */}
       {cars.length > 0 && (
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="bg-[#1A2332] rounded-2xl p-4 border border-white/5 text-center">
@@ -204,7 +199,7 @@ export default function Cars() {
         </div>
       )}
 
-      {/* ===== CAR LIST ===== */}
+      {/* Empty State */}
       {cars.length === 0 ? (
         <EmptyState
           icon={<HiOutlineTruck size={40} className="text-[#64748B] opacity-20" />}
@@ -221,24 +216,14 @@ export default function Cars() {
               className="bg-[#1A2332] rounded-2xl p-5 border border-white/5 shadow-lg shadow-black/10 card-lift list-item-enter"
               style={{ animationDelay: `${index * 60}ms` }}
             >
-              {/* Top Section: Icon + Info + Status */}
               <div className="flex items-start gap-4 mb-4">
-                {/* Vehicle Icon */}
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${
-                  car.status === 'healthy' ? 'bg-success/10' : 'bg-danger/10'
-                }`}>
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${car.status === 'healthy' ? 'bg-success/10' : 'bg-danger/10'}`}>
                   <HiOutlineTruck size={24} className={car.status === 'healthy' ? 'text-success' : 'text-danger'} />
                 </div>
-
-                {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
                     <h3 className="text-[18px] font-mono font-bold text-white tracking-wide">{car.plateNumber}</h3>
-                    <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1 rounded-full flex-shrink-0 ${
-                      car.status === 'healthy'
-                        ? 'bg-[#065F46] text-success'
-                        : 'bg-[#7F1D1D] text-danger'
-                    }`}>
+                    <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1 rounded-full flex-shrink-0 ${car.status === 'healthy' ? 'bg-[#065F46] text-success' : 'bg-[#7F1D1D] text-danger'}`}>
                       <span className={`w-2 h-2 rounded-full ${car.status === 'damaged' ? 'animate-pulse' : ''} ${car.status === 'healthy' ? 'bg-success' : 'bg-danger'}`} />
                       {car.status === 'healthy' ? 'Healthy' : 'Damaged'}
                     </span>
@@ -251,7 +236,6 @@ export default function Cars() {
                 </div>
               </div>
 
-              {/* Stats Row */}
               <div className="flex justify-between py-4 border-y border-white/5 mb-4">
                 <div className="text-center flex-1">
                   <p className="text-[#64748B] text-[10px] uppercase tracking-widest mb-1">Income</p>
@@ -263,34 +247,19 @@ export default function Cars() {
                 </div>
                 <div className="text-center flex-1 border-l border-white/5">
                   <p className="text-[#64748B] text-[10px] uppercase tracking-widest mb-1">Profit</p>
-                  <p className={`font-semibold text-[14px] tabular-nums ${(car.profitThisMonth || 0) >= 0 ? 'text-success' : 'text-danger'}`}>
-                    {formatCurrency(car.profitThisMonth || 0)}
-                  </p>
+                  <p className={`font-semibold text-[14px] tabular-nums ${(car.profitThisMonth || 0) >= 0 ? 'text-success' : 'text-danger'}`}>{formatCurrency(car.profitThisMonth || 0)}</p>
                 </div>
               </div>
 
-              {/* Actions Row */}
               <div className="flex gap-2">
-                <button
-                  onClick={() => navigate(`/cars/${car._id}`)}
-                  className="flex-1 bg-teal-500/10 text-teal-500 rounded-2xl h-[44px] text-[13px] font-semibold flex items-center justify-center gap-1.5 hover:bg-teal-500/20 transition-all duration-200"
-                >
-                  View Details
-                  <HiOutlineChevronRight size={14} />
+                <button onClick={() => navigate(`/cars/${car._id}`)} className="flex-1 bg-teal-500/10 text-teal-500 rounded-2xl h-[44px] text-[13px] font-semibold flex items-center justify-center gap-1.5 hover:bg-teal-500/20 transition-all duration-200">
+                  View Details <HiOutlineChevronRight size={14} />
                 </button>
-                <button
-                  onClick={() => handleEdit(car)}
-                  className="flex-1 bg-white/5 text-[#94A3B8] rounded-2xl h-[44px] text-[13px] font-semibold flex items-center justify-center gap-1.5 hover:bg-white/10 hover:text-white transition-all duration-200"
-                >
-                  <HiOutlinePencilSquare size={15} />
-                  Edit
+                <button onClick={() => handleEdit(car)} className="flex-1 bg-white/5 text-[#94A3B8] rounded-2xl h-[44px] text-[13px] font-semibold flex items-center justify-center gap-1.5 hover:bg-white/10 hover:text-white transition-all duration-200">
+                  <HiOutlinePencilSquare size={15} /> Edit
                 </button>
-                <button
-                  onClick={() => setDeleteConfirm(car)}
-                  className="flex-1 bg-white/5 text-[#94A3B8] rounded-2xl h-[44px] text-[13px] font-semibold flex items-center justify-center gap-1.5 hover:bg-red-500/10 hover:text-danger transition-all duration-200"
-                >
-                  <HiOutlineTrash size={15} />
-                  Delete
+                <button onClick={() => setDeleteConfirm(car)} className="flex-1 bg-white/5 text-[#94A3B8] rounded-2xl h-[44px] text-[13px] font-semibold flex items-center justify-center gap-1.5 hover:bg-red-500/10 hover:text-danger transition-all duration-200">
+                  <HiOutlineTrash size={15} /> Delete
                 </button>
               </div>
             </div>
@@ -298,7 +267,7 @@ export default function Cars() {
         </div>
       )}
 
-      {/* ===== FLOATING ACTION BUTTON ===== */}
+      {/* FAB */}
       <button
         onClick={() => { resetForm(); setShowForm(true) }}
         className="fixed bottom-28 right-5 z-40 w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center shadow-2xl shadow-teal-500/30 fab-glow ripple btn-press lg:hidden"
@@ -306,19 +275,19 @@ export default function Cars() {
         <HiOutlinePlus size={26} strokeWidth={2.5} className="text-white" />
       </button>
 
-      {/* ===== BOTTOM SHEET MODAL — Add/Edit Car ===== */}
+      {/* Bottom Sheet Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={resetForm}>
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm backdrop-enter" />
           <div
-            className="relative bg-[#1A2332] rounded-t-[24px] w-full max-w-[480px] p-6 max-h-[85vh] overflow-y-auto sheet-enter border border-white/5"
+            className="relative bg-[#1A2332] rounded-t-[24px] w-full max-w-[480px] p-6 max-h-[80vh] overflow-y-auto sheet-enter border border-white/5"
             onClick={(e) => e.stopPropagation()}
-            style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}
+            style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))' }}
           >
             <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-6" />
 
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-[22px] font-semibold text-white">{editingCar ? 'Edit Vehicle' : 'Add New Vehicle'}</h3>
+              <h3 className="text-[20px] font-semibold text-white">{editingCar ? 'Edit Vehicle' : 'Add New Vehicle'}</h3>
               <button type="button" onClick={resetForm} className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-[#94A3B8] hover:text-white hover:bg-white/10 transition-all duration-200">
                 <HiOutlineXMark size={18} />
               </button>
@@ -329,77 +298,34 @@ export default function Cars() {
                 <label className={labelClass}>Plate Number</label>
                 <div className="relative">
                   <HiOutlineTruck size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-                  <input
-                    type="text"
-                    value={form.plateNumber}
-                    onChange={(e) => setForm(prev => ({ ...prev, plateNumber: e.target.value.toUpperCase() }))}
-                    className={formInputClass}
-                    placeholder="KDA 123T"
-                    required
-                    autoFocus
-                  />
+                  <input type="text" value={form.plateNumber} onChange={(e) => setForm(prev => ({ ...prev, plateNumber: e.target.value.toUpperCase() }))} className={formInputClass} placeholder="KDA 123T" required autoFocus />
                 </div>
               </div>
-
               <div>
                 <label className={labelClass}>Passenger Capacity</label>
                 <div className="relative">
                   <HiOutlineUsers size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-                  <input
-                    type="number"
-                    value={form.passengerCapacity}
-                    onChange={(e) => setForm(prev => ({ ...prev, passengerCapacity: e.target.value }))}
-                    className={formInputClass}
-                    placeholder="11"
-                    required
-                    min="1"
-                  />
+                  <input type="number" value={form.passengerCapacity} onChange={(e) => setForm(prev => ({ ...prev, passengerCapacity: e.target.value }))} className={formInputClass} placeholder="11" required min="1" />
                 </div>
               </div>
-
               <div>
                 <label className={labelClass}>Driver Name</label>
                 <div className="relative">
                   <HiOutlinePencilSquare size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-                  <input
-                    type="text"
-                    value={form.driverName}
-                    onChange={(e) => setForm(prev => ({ ...prev, driverName: e.target.value }))}
-                    className={formInputClass}
-                    placeholder="Driver name"
-                    required
-                  />
+                  <input type="text" value={form.driverName} onChange={(e) => setForm(prev => ({ ...prev, driverName: e.target.value }))} className={formInputClass} placeholder="Driver name" required />
                 </div>
               </div>
-
               <div>
                 <label className={labelClass}>Driver Phone</label>
                 <div className="relative">
                   <HiOutlinePhone size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-                  <input
-                    type="tel"
-                    value={form.driverPhone}
-                    onChange={(e) => setForm(prev => ({ ...prev, driverPhone: e.target.value }))}
-                    className={formInputClass}
-                    placeholder="+254 712 345678"
-                    required
-                  />
+                  <input type="tel" value={form.driverPhone} onChange={(e) => setForm(prev => ({ ...prev, driverPhone: e.target.value }))} className={formInputClass} placeholder="+254 712 345678" required />
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-4 sticky bottom-0 bg-[#1A2332] pb-2">
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="flex-1 bg-white/5 hover:bg-white/10 text-white rounded-2xl h-[56px] font-medium text-[15px] transition-all duration-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex-1 bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-2xl h-[56px] font-semibold text-[15px] transition-all duration-200 disabled:opacity-40 shadow-lg shadow-teal-500/20 ripple btn-press"
-                >
+              <div className="flex gap-3 pt-2 pb-4">
+                <button type="button" onClick={resetForm} className="flex-1 bg-white/5 hover:bg-white/10 text-white rounded-2xl h-[56px] font-medium text-[15px] transition-all duration-200">Cancel</button>
+                <button type="submit" disabled={saving} className="flex-1 bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-2xl h-[56px] font-semibold text-[15px] transition-all duration-200 disabled:opacity-40 shadow-lg shadow-teal-500/20 ripple btn-press">
                   {saving ? 'Saving...' : editingCar ? 'Update Vehicle' : 'Add Vehicle'}
                 </button>
               </div>
@@ -408,7 +334,7 @@ export default function Cars() {
         </div>
       )}
 
-      {/* ===== DELETE CONFIRMATION DIALOG ===== */}
+      {/* Delete Confirmation */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={() => setDeleteConfirm(null)}>
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm backdrop-enter" />
@@ -417,23 +343,10 @@ export default function Cars() {
               <HiOutlineTrash size={26} className="text-danger" />
             </div>
             <h3 className="text-[20px] font-semibold text-white text-center mb-2">Delete Vehicle?</h3>
-            <p className="text-[#94A3B8] text-[14px] text-center mb-6">
-              Are you sure you want to delete <strong className="text-white">{deleteConfirm.plateNumber}</strong>?<br />
-              This action cannot be undone. History will be preserved.
-            </p>
+            <p className="text-[#94A3B8] text-[14px] text-center mb-6">Are you sure you want to delete <strong className="text-white">{deleteConfirm.plateNumber}</strong>?<br />This cannot be undone. History will be preserved.</p>
             <div className="flex gap-3">
-              <button
-                onClick={() => setDeleteConfirm(null)}
-                className="flex-1 bg-white/5 hover:bg-white/10 text-white rounded-2xl h-[52px] font-medium text-[15px] transition-all duration-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDelete(deleteConfirm._id)}
-                className="flex-1 bg-danger hover:bg-red-600 text-white rounded-2xl h-[52px] font-semibold text-[15px] transition-all duration-200 shadow-lg shadow-red-500/15"
-              >
-                Delete
-              </button>
+              <button onClick={() => setDeleteConfirm(null)} className="flex-1 bg-white/5 hover:bg-white/10 text-white rounded-2xl h-[52px] font-medium text-[15px] transition-all duration-200">Cancel</button>
+              <button onClick={() => handleDelete(deleteConfirm._id)} className="flex-1 bg-danger hover:bg-red-600 text-white rounded-2xl h-[52px] font-semibold text-[15px] transition-all duration-200 shadow-lg shadow-red-500/15">Delete</button>
             </div>
           </div>
         </div>

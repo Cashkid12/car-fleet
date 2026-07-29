@@ -21,9 +21,15 @@ exports.addDamage = async (req, res) => {
     const referenceNumber = await generateDamageRef();
 
     car.damageHistory.push({
-      date: date || new Date(), damageType, description: description || '',
-      estimatedCost: Number(estimatedCost), driverAtFault: driverAtFault || false,
-      referenceNumber, note: note || '', status: 'reported', recordedAt: new Date()
+      date: date || new Date(),
+      damageType,
+      description: description || '',
+      estimatedCost: Number(estimatedCost),
+      driverAtFault: driverAtFault === true || driverAtFault === 'true',
+      referenceNumber,
+      note: note || '',
+      status: 'reported',
+      recordedAt: new Date()
     });
     car.status = 'damaged';
     await car.save();
