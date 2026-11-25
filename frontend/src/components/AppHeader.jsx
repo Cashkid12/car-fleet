@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { UserButton } from '@clerk/clerk-react'
 import api from '../services/api'
+import BrandMark from './BrandMark'
 import { HiOutlineBell } from 'react-icons/hi2'
 
 export default function AppHeader({ title, subtitle }) {
   const [unreadCount, setUnreadCount] = useState(0)
-  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchCount = async () => {
@@ -21,27 +21,35 @@ export default function AppHeader({ title, subtitle }) {
   }, [])
 
   return (
-    <div className="bg-[#111827] border-b border-white/5">
-      <div className="flex items-center justify-between px-5 h-[64px] max-w-[480px] mx-auto">
-        <div className="w-9 h-9 bg-gradient-to-br from-teal-500 to-teal-600 rounded-[10px] flex items-center justify-center shadow-lg shadow-teal-500/20 flex-shrink-0">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-            <path d="M13 5l3 5m0 0h2.5a1.5 1.5 0 011.423 1.026L21 14H3l1.077-2.974A1.5 1.5 0 015.5 10H8m5 0H8m5 0v5H8V10" />
-          </svg>
+    <div className="border-b border-hairline bg-canvas/85 backdrop-blur-xl">
+      <div className="mx-auto flex h-[58px] w-full max-w-[1400px] items-center gap-3 px-4 sm:px-6">
+        <Link to="/" aria-label="Fleet Manager home" className="flex items-center">
+          <BrandMark size={28} iconSize={15} radius={8} />
+        </Link>
+
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-[14.5px] font-semibold leading-tight tracking-tight">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="truncate text-[11px] leading-tight text-ink-faint">{subtitle}</p>
+          )}
         </div>
-        <div className="flex-1 text-center mx-3">
-          <h1 className="text-[17px] font-semibold text-white tracking-tight leading-tight">{title}</h1>
-          {subtitle && <p className="text-[12px] text-[#64748B] leading-tight">{subtitle}</p>}
-        </div>
-        <div className="flex items-center gap-1">
-          <button onClick={() => navigate('/notifications')} className="w-10 h-10 rounded-full flex items-center justify-center text-[#64748B] hover:text-white hover:bg-white/5 transition-all duration-200 relative">
-            <HiOutlineBell size={20} />
-            {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-5 bg-teal-500 rounded-full text-white text-[10px] font-bold flex items-center justify-center px-1 ring-2 ring-[#111827]">
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </span>
-            )}
-          </button>
+
+        <Link
+          to="/notifications"
+          aria-label="Notifications"
+          className="relative flex h-9 w-9 items-center justify-center rounded-[10px] text-ink-soft transition-colors hover:bg-ghost hover:text-ink"
+        >
+          <HiOutlineBell size={19} />
+          {unreadCount > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-solid px-1 text-[9.5px] font-bold text-solid-ink ring-2 ring-canvas">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+        </Link>
+
+        <div className="flex h-8 w-8 items-center justify-center">
           <UserButton />
         </div>
       </div>

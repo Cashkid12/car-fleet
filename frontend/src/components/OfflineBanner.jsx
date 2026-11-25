@@ -18,9 +18,11 @@ export default function OfflineBanner() {
   if (!isOffline) return null
 
   return (
-    <div className="bg-warning/95 text-black text-[13px] font-semibold px-4 py-2.5 flex items-center justify-center gap-2 offline-banner-slide">
-      <HiOutlineWifi size={18} />
-      <span>No internet connection — your changes are safely stored and will sync automatically</span>
+    <div className="offline-banner-slide flex items-center justify-center gap-2 border-b border-hairline bg-panel-soft px-4 py-2 text-ink-soft">
+      <HiOutlineWifi size={15} />
+      <span className="t-xs text-center">
+        No internet connection — changes are stored and will sync automatically
+      </span>
     </div>
   )
 }

@@ -19,10 +19,10 @@ export default function FAB() {
   return (
     <button
       onClick={() => navigate(action.path)}
-      className="fixed bottom-28 right-5 z-40 w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center shadow-2xl shadow-teal-500/30 fab-glow ripple btn-press lg:hidden"
+      className="fixed bottom-[88px] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full border border-hairline-strong bg-solid text-solid-ink shadow-[0_12px_30px_-12px_rgba(0,0,0,0.55)] transition-transform duration-150 active:scale-95"
       aria-label={action.label}
     >
-      <HiOutlinePlus size={26} strokeWidth={2.5} className="text-white" />
+      <HiOutlinePlus size={24} strokeWidth={2} />
     </button>
   )
 }

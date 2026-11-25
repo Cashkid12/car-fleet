@@ -18,16 +18,18 @@ export default class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#0B1120] flex items-center justify-center px-5">
-          <div className="text-center max-w-sm">
-            <div className="w-20 h-20 bg-danger/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <HiOutlineExclamationTriangle size={40} className="text-danger" />
+        <div className="flex min-h-screen items-center justify-center bg-canvas px-5">
+          <div className="max-w-sm text-center">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-hairline bg-panel-soft">
+              <HiOutlineExclamationTriangle size={28} className="text-ink" />
             </div>
-            <h1 className="text-[22px] font-bold text-white mb-2">Something went wrong</h1>
-            <p className="text-[#94A3B8] text-[15px] mb-8">The app encountered an unexpected error. Please try again.</p>
+            <h1 className="t-page mb-2">Something went wrong</h1>
+            <p className="t-sm mb-8 text-ink-soft">
+              The app encountered an unexpected error. Please try again.
+            </p>
             <button
               onClick={() => { this.setState({ hasError: false }); window.location.href = '/' }}
-              className="bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-2xl h-[52px] px-8 text-[15px] transition-all duration-200"
+              className="btn btn-primary btn-lg"
             >
               Go Home
             </button>

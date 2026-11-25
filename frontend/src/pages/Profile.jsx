@@ -6,25 +6,22 @@ import { formatCurrency } from '../utils/formatters'
 import { useSettings } from '../context/SettingsContext'
 import { useToast } from '../components/Toast'
 import {
-  HiOutlineCog,
+  HiOutlineUserCircle,
   HiOutlineArrowRightOnRectangle,
-  HiOutlineTruck,
-  HiOutlineCurrencyDollar,
-  HiOutlineArrowTrendingUp,
-  HiOutlineCheckCircle,
-  HiOutlineXMark,
   HiOutlineMoon,
   HiOutlineSun,
   HiOutlineComputerDesktop,
   HiOutlineBell,
-  HiOutlineShieldCheck,
   HiOutlineArrowDownTray,
   HiOutlineTrash,
   HiOutlineQuestionMarkCircle,
-  HiOutlineInformationCircle,
   HiOutlineBuildingOffice,
-  HiOutlineGlobeAlt
+  HiOutlineChevronRight
 } from 'react-icons/hi2'
+
+const optionBase = 'rounded-[12px] border px-3 py-3 text-center transition-colors duration-150'
+const optionIdle = 'border-hairline bg-field text-ink-soft hover:border-hairline-strong hover:text-ink'
+const optionActive = 'border-[var(--solid)] bg-[var(--solid)] text-[var(--solid-ink)]'
 
 export default function Profile() {
   const { user: clerkUser } = useUser()
@@ -40,8 +37,6 @@ export default function Profile() {
   const [businessForm, setBusinessForm] = useState({
     businessName: '', businessAddress: '', businessPhone: '', businessEmail: ''
   })
-
-  useEffect(() => { fetchProfile() }, [])
 
   useEffect(() => {
     if (profile?.settings) {
@@ -60,6 +55,8 @@ export default function Profile() {
       setProfile(res.data)
     } catch {} finally { setLoading(false) }
   }
+
+  useEffect(() => { fetchProfile() }, [])
 
   const handleSaveBusiness = async () => {
     setSaving(true)
@@ -107,22 +104,26 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="px-5 py-8 max-w-lg mx-auto">
-        <div className="skeleton h-48 rounded-2xl mb-6" />
-        <div className="skeleton h-64 rounded-2xl" />
+      <div>
+        <div className="skeleton mb-2 h-9 w-40" />
+        <div className="skeleton mb-6 h-4 w-56" />
+        <div className="grid gap-4 lg:grid-cols-[300px_1fr]">
+          <div className="skeleton h-[280px]" />
+          <div className="skeleton h-[420px]" />
+        </div>
       </div>
     )
   }
 
   const statCards = profile?.fleetStats ? [
-    { label: 'Vehicles', value: profile.fleetStats.totalVehicles, icon: HiOutlineTruck, color: 'text-teal-500' },
-    { label: 'Total Income', value: formatCurrency(profile.fleetStats.totalIncome), icon: HiOutlineCurrencyDollar, color: 'text-success' },
-    { label: 'Net Profit', value: formatCurrency(profile.fleetStats.totalProfit), icon: HiOutlineArrowTrendingUp, color: profile.fleetStats.totalProfit >= 0 ? 'text-success' : 'text-danger' },
-    { label: 'Healthy', value: `${profile.fleetStats.healthyVehicles}/${profile.fleetStats.totalVehicles}`, icon: HiOutlineCheckCircle, color: 'text-success' },
+    { label: 'Vehicles', value: String(profile.fleetStats.totalVehicles) },
+    { label: 'Total income', value: formatCurrency(profile.fleetStats.totalIncome) },
+    { label: 'Net profit', value: formatCurrency(profile.fleetStats.totalProfit) },
+    { label: 'Healthy', value: `${profile.fleetStats.healthyVehicles}/${profile.fleetStats.totalVehicles}` },
   ] : []
 
   const sections = [
-    { key: 'profile', label: 'Profile', icon: HiOutlineCog },
+    { key: 'profile', label: 'Profile', icon: HiOutlineUserCircle },
     { key: 'business', label: 'Business', icon: HiOutlineBuildingOffice },
     { key: 'appearance', label: 'Appearance', icon: HiOutlineMoon },
     { key: 'notifications', label: 'Notifications', icon: HiOutlineBell },
@@ -130,303 +131,354 @@ export default function Profile() {
     { key: 'help', label: 'Help', icon: HiOutlineQuestionMarkCircle },
   ]
 
+  const panelTitle = {
+    profile: 'Personal information',
+    business: 'Business settings',
+    appearance: 'Appearance',
+    notifications: 'Notification preferences',
+    data: 'Data management',
+    help: 'Help & about',
+  }
+
   return (
-    <div className="page-enter max-w-lg mx-auto px-5 py-8">
-      {/* Profile Header Card */}
-      <div className="bg-gradient-to-br from-teal-500/20 to-teal-500/5 rounded-2xl p-5 border border-teal-500/20 mb-6">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg shadow-teal-500/20 flex-shrink-0">
-            {initial}
-          </div>
-          <div>
-            <h2 className="text-lg font-bold text-white">{name}</h2>
-            <p className="text-[#94A3B8] text-[13px]">Fleet Owner</p>
-            <p className="text-[#64748B] text-[11px] mt-0.5">Member since {memberSince}</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-white/5">
-          {statCards.map((stat, i) => (
-            <div key={i} className="text-center">
-              <stat.icon size={18} className={`${stat.color} mx-auto mb-1`} />
-              <p className="text-[11px] text-[#64748B]">{stat.label}</p>
-              <p className={`text-sm font-bold ${stat.color}`}>{stat.value}</p>
+    <div className="page-enter">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="t-page">Profile</h1>
+        <p className="t-sm mt-1 text-ink-soft">Manage your account, preferences and data.</p>
+      </div>
+
+      <div className="grid items-start gap-4 lg:grid-cols-[300px_1fr] lg:gap-6">
+        {/* Identity */}
+        <aside className="card p-5 lg:sticky lg:top-8">
+          <div className="flex items-center gap-3.5">
+            <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-solid text-[20px] font-semibold text-solid-ink">
+              {initial}
+            </span>
+            <div className="min-w-0">
+              <h2 className="truncate text-[15px] font-semibold">{name}</h2>
+              <p className="t-xs mt-0.5 text-ink-soft">Fleet owner</p>
+              {memberSince && <p className="t-micro mt-0.5 text-ink-faint">Member since {memberSince}</p>}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* Section Navigation */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
-        {sections.map(s => (
-          <button
-            key={s.key}
-            onClick={() => setActiveSection(s.key)}
-            className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-semibold transition-all duration-200 ${
-              activeSection === s.key ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/20' : 'bg-[#1A2332] text-[#94A3B8] border border-white/5'
-            }`}
-          >
-            <s.icon size={16} />
-            {s.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Section Content */}
-      <div className="space-y-4">
-        {activeSection === 'profile' && (
-          <div className="bg-[#1A2332] rounded-2xl p-5 border border-white/5">
-            <h3 className="text-[18px] font-semibold text-white mb-4">Personal Information</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between py-2 border-b border-white/5">
-                <span className="text-[#64748B] text-[13px]">Name</span>
-                <span className="text-white text-[13px] font-medium">{name}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-white/5">
-                <span className="text-[#64748B] text-[13px]">Email</span>
-                <span className="text-white text-[13px] font-medium truncate ml-4">{email}</span>
-              </div>
-              {phone && (
-                <div className="flex justify-between py-2 border-b border-white/5">
-                  <span className="text-[#64748B] text-[13px]">Phone</span>
-                  <span className="text-white text-[13px] font-medium">{phone}</span>
+          {statCards.length > 0 && (
+            <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-hairline pt-4">
+              {statCards.map((stat) => (
+                <div key={stat.label} className="min-w-0">
+                  <p className="t-label text-[9.5px]">{stat.label}</p>
+                  <p className="figure-sm mt-1 truncate text-[13px]">{stat.value}</p>
                 </div>
-              )}
+              ))}
+            </div>
+          )}
+
+          <div className="mt-5 space-y-2.5 border-t border-hairline pt-4">
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="t-micro flex-shrink-0 text-ink-faint">Email</span>
+              <span className="t-xs truncate font-medium">{email}</span>
+            </div>
+            {phone && (
+              <div className="flex items-baseline justify-between gap-3">
+                <span className="t-micro flex-shrink-0 text-ink-faint">Phone</span>
+                <span className="mono text-[12px] font-medium">{phone}</span>
+              </div>
+            )}
+          </div>
+        </aside>
+
+        {/* Settings */}
+        <section className="min-w-0">
+          <div className="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+            {sections.map(s => (
               <button
-                onClick={() => window.location.href = 'https://accounts.clerk.com/user'}
-                className="w-full bg-teal-500 hover:bg-teal-600 text-white rounded-2xl h-[52px] font-semibold text-[14px] transition-all duration-200 mt-2 shadow-lg shadow-teal-500/15"
+                key={s.key}
+                onClick={() => setActiveSection(s.key)}
+                className={`pill flex-shrink-0 ${activeSection === s.key ? 'pill-active' : ''}`}
               >
-                Manage Account
+                <s.icon size={14} />
+                {s.label}
               </button>
-            </div>
+            ))}
           </div>
-        )}
 
-        {activeSection === 'business' && (
-          <div className="bg-[#1A2332] rounded-2xl p-5 border border-white/5">
-            <h3 className="text-[18px] font-semibold text-white mb-4">Business Settings</h3>
-            <div className="space-y-4">
-              {[
-                { label: 'Business Name', value: businessForm.businessName, field: 'businessName', placeholder: 'Your business name' },
-                { label: 'Business Phone', value: businessForm.businessPhone, field: 'businessPhone', placeholder: '+254 712 345678' },
-                { label: 'Business Email', value: businessForm.businessEmail, field: 'businessEmail', placeholder: 'business@email.com' },
-                { label: 'Business Address', value: businessForm.businessAddress, field: 'businessAddress', placeholder: 'Your address' },
-              ].map((input, i) => (
-                <div key={i}>
-                  <label className="text-[12px] text-[#64748B] uppercase tracking-widest font-semibold mb-2 block">{input.label}</label>
-                  <input
-                    type="text"
-                    value={input.value}
-                    onChange={(e) => setBusinessForm(prev => ({ ...prev, [input.field]: e.target.value }))}
-                    className="w-full bg-[#0B1120] text-white rounded-2xl px-4 h-[56px] border border-white/5 focus:border-teal-500 focus:outline-none text-[15px] transition-all duration-200"
-                    placeholder={input.placeholder}
-                  />
-                </div>
-              ))}
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={handleSaveBusiness}
-                  disabled={saving}
-                  className="flex-1 bg-teal-500 hover:bg-teal-600 text-white rounded-2xl h-[52px] font-semibold text-[14px] transition-all duration-200 disabled:opacity-40 shadow-lg shadow-teal-500/15"
-                >
-                  {saving ? 'Saving...' : 'Save Business Settings'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+          <div className="card p-5 sm:p-6">
+            <h2 className="t-cardtitle mb-5">{panelTitle[activeSection]}</h2>
 
-        {activeSection === 'appearance' && (
-          <div className="bg-[#1A2332] rounded-2xl p-5 border border-white/5 space-y-6">
-            <div>
-              <h3 className="text-[18px] font-semibold text-white mb-1">Theme</h3>
-              <p className="text-[#64748B] text-[13px] mb-3">Choose your preferred appearance</p>
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { key: 'dark', label: 'Dark', icon: HiOutlineMoon },
-                  { key: 'light', label: 'Light', icon: HiOutlineSun },
-                  { key: 'system', label: 'System', icon: HiOutlineComputerDesktop },
-                ].map(t => (
-                  <button
-                    key={t.key}
-                    onClick={() => updateSettings({ theme: t.key })}
-                    className={`flex flex-col items-center gap-2 py-4 rounded-2xl border transition-all duration-200 ${
-                      settings.theme === t.key ? 'border-teal-500 bg-teal-500/10 text-teal-400' : 'border-white/5 bg-[#0B1120] text-[#94A3B8]'
-                    }`}
-                  >
-                    <t.icon size={22} />
-                    <span className="text-[12px] font-medium">{t.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-[18px] font-semibold text-white mb-1">Font Size</h3>
-              <p className="text-[#64748B] text-[13px] mb-3">Adjust text size</p>
-              <div className="grid grid-cols-3 gap-2">
-                {['small', 'medium', 'large'].map(size => (
-                  <button
-                    key={size}
-                    onClick={() => updateSettings({ fontSize: size })}
-                    className={`py-3 rounded-2xl border transition-all duration-200 ${
-                      settings.fontSize === size ? 'border-teal-500 bg-teal-500/10 text-teal-400 font-semibold' : 'border-white/5 bg-[#0B1120] text-[#94A3B8]'
-                    }`}
-                  >
-                    <span className={`${size === 'small' ? 'text-[12px]' : size === 'large' ? 'text-[18px]' : 'text-[15px]'} font-medium capitalize`}>{size}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-[18px] font-semibold text-white mb-1">Layout</h3>
-              <p className="text-[#64748B] text-[13px] mb-3">Choose spacing density</p>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { key: 'comfortable', label: 'Comfortable', desc: 'More spacing' },
-                  { key: 'compact', label: 'Compact', desc: 'Tighter spacing' },
-                ].map(l => (
-                  <button
-                    key={l.key}
-                    onClick={() => updateSettings({ layout: l.key })}
-                    className={`py-3 px-4 rounded-2xl border text-left transition-all duration-200 ${
-                      settings.layout === l.key ? 'border-teal-500 bg-teal-500/10 text-teal-400' : 'border-white/5 bg-[#0B1120] text-[#94A3B8]'
-                    }`}
-                  >
-                    <span className="text-[14px] font-semibold block">{l.label}</span>
-                    <span className="text-[11px]">{l.desc}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-[18px] font-semibold text-white mb-1">Currency</h3>
-              <div className="grid grid-cols-4 gap-2 mt-3">
-                {['KES', 'USD', 'EUR', 'GBP'].map(c => (
-                  <button
-                    key={c}
-                    onClick={() => updateSettings({ currency: c })}
-                    className={`py-3 rounded-2xl border text-[14px] font-semibold transition-all duration-200 ${
-                      settings.currency === c ? 'border-teal-500 bg-teal-500/10 text-teal-400' : 'border-white/5 bg-[#0B1120] text-[#94A3B8]'
-                    }`}
-                  >
-                    {c}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeSection === 'notifications' && (
-          <div className="bg-[#1A2332] rounded-2xl p-5 border border-white/5">
-            <h3 className="text-[18px] font-semibold text-white mb-1">Notification Preferences</h3>
-            <p className="text-[#64748B] text-[13px] mb-4">Choose which notifications you receive</p>
-            <div className="space-y-3">
-              {[
-                { key: 'income', label: 'Income Notifications' },
-                { key: 'expense', label: 'Expense Notifications' },
-                { key: 'damage', label: 'Damage Notifications' },
-                { key: 'vehicle', label: 'Vehicle Notifications' },
-                { key: 'reports', label: 'Report Notifications' },
-                { key: 'system', label: 'System Notifications' },
-              ].map(n => (
-                <div key={n.key} className="flex items-center justify-between py-2 border-b border-white/5">
-                  <span className="text-white text-[14px]">{n.label}</span>
-                  <button
-                    onClick={() => {
-                      const prefs = { ...settings.notificationPreferences, [n.key]: !settings.notificationPreferences[n.key] }
-                      updateSettings({ notificationPreferences: prefs })
-                    }}
-                    className={`w-12 h-7 rounded-full transition-all duration-200 relative ${
-                      settings.notificationPreferences[n.key] ? 'bg-teal-500' : 'bg-[#2A3441]'
-                    }`}
-                  >
-                    <span className={`absolute top-0.5 w-6 h-6 rounded-full bg-white transition-all duration-200 shadow ${
-                      settings.notificationPreferences[n.key] ? 'left-[22px]' : 'left-[2px]'
-                    }`} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeSection === 'data' && (
-          <div className="space-y-3">
-            <div className="bg-[#1A2332] rounded-2xl p-5 border border-white/5">
-              <h3 className="text-[18px] font-semibold text-white mb-1">Data Management</h3>
-              <p className="text-[#64748B] text-[13px] mb-4">Export or delete your fleet data</p>
-              <div className="space-y-3">
-                <button
-                  onClick={handleExportData}
-                  className="w-full bg-[#0B1120] border border-white/5 rounded-2xl p-4 flex items-center gap-3 text-left hover:border-teal-500/30 transition-all duration-200"
-                >
-                  <HiOutlineArrowDownTray size={22} className="text-teal-500" />
-                  <div>
-                    <p className="text-white text-[14px] font-medium">Export All Data</p>
-                    <p className="text-[#64748B] text-[12px]">Download JSON backup</p>
+            {activeSection === 'profile' && (
+              <div>
+                <dl className="divide-y divide-hairline border-y border-hairline">
+                  <div className="flex items-center justify-between gap-4 py-3">
+                    <dt className="t-sm text-ink-soft">Name</dt>
+                    <dd className="t-sm truncate font-medium">{name}</dd>
                   </div>
-                </button>
-                <button
-                  onClick={() => setShowDeleteData(true)}
-                  className="w-full bg-[#0B1120] border border-white/5 rounded-2xl p-4 flex items-center gap-3 text-left hover:border-danger/30 transition-all duration-200"
-                >
-                  <HiOutlineTrash size={22} className="text-danger" />
-                  <div>
-                    <p className="text-white text-[14px] font-medium">Delete All Data</p>
-                    <p className="text-[#64748B] text-[12px]">Remove all vehicles and records</p>
+                  <div className="flex items-center justify-between gap-4 py-3">
+                    <dt className="t-sm flex-shrink-0 text-ink-soft">Email</dt>
+                    <dd className="t-sm truncate font-medium">{email}</dd>
                   </div>
+                  {phone && (
+                    <div className="flex items-center justify-between gap-4 py-3">
+                      <dt className="t-sm text-ink-soft">Phone</dt>
+                      <dd className="mono t-sm font-medium">{phone}</dd>
+                    </div>
+                  )}
+                </dl>
+                <button
+                  onClick={() => window.location.href = 'https://accounts.clerk.com/user'}
+                  className="btn btn-primary btn-block mt-5"
+                >
+                  Manage account
                 </button>
               </div>
-            </div>
-          </div>
-        )}
+            )}
 
-        {activeSection === 'help' && (
-          <div className="bg-[#1A2332] rounded-2xl p-5 border border-white/5">
-            <h3 className="text-[18px] font-semibold text-white mb-4">Help & About</h3>
-            <div className="space-y-2">
-              {[
-                { label: 'About Fleet Manager', value: 'Version 2.0.0' },
-                { label: 'Build', value: '2026.07' },
-                { label: 'Made for', value: 'Fleet Owners in Kenya' },
-                { label: 'Contact', value: 'support@fleetmanager.app' },
-              ].map((item, i) => (
-                <div key={i} className="flex justify-between py-2 border-b border-white/5">
-                  <span className="text-[#64748B] text-[13px]">{item.label}</span>
-                  <span className="text-white text-[13px] font-medium">{item.value}</span>
+            {activeSection === 'business' && (
+              <form
+                onSubmit={(e) => { e.preventDefault(); handleSaveBusiness() }}
+                className="space-y-4"
+              >
+                {[
+                  { label: 'Business name', value: businessForm.businessName, field: 'businessName', placeholder: 'Your business name' },
+                  { label: 'Business phone', value: businessForm.businessPhone, field: 'businessPhone', placeholder: '+254 712 345678' },
+                  { label: 'Business email', value: businessForm.businessEmail, field: 'businessEmail', placeholder: 'business@email.com' },
+                  { label: 'Business address', value: businessForm.businessAddress, field: 'businessAddress', placeholder: 'Your address' },
+                ].map((input) => (
+                  <div key={input.field}>
+                    <label className="t-label mb-1.5 block">{input.label}</label>
+                    <input
+                      type="text"
+                      value={input.value}
+                      onChange={(e) => setBusinessForm(prev => ({ ...prev, [input.field]: e.target.value }))}
+                      className="field"
+                      placeholder={input.placeholder}
+                    />
+                  </div>
+                ))}
+                <button type="submit" disabled={saving} className="btn btn-primary btn-block mt-2">
+                  {saving ? 'Saving...' : 'Save business settings'}
+                </button>
+              </form>
+            )}
+
+            {activeSection === 'appearance' && (
+              <div className="space-y-7">
+                <div>
+                  <h3 className="t-sm font-semibold">Theme</h3>
+                  <p className="t-xs mb-3 mt-0.5 text-ink-faint">Choose your preferred appearance</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { key: 'dark', label: 'Dark', icon: HiOutlineMoon },
+                      { key: 'light', label: 'Light', icon: HiOutlineSun },
+                      { key: 'system', label: 'System', icon: HiOutlineComputerDesktop },
+                    ].map(t => (
+                      <button
+                        key={t.key}
+                        onClick={() => updateSettings({ theme: t.key })}
+                        aria-pressed={settings.theme === t.key}
+                        className={`${optionBase} flex flex-col items-center gap-2 py-4 ${settings.theme === t.key ? optionActive : optionIdle}`}
+                      >
+                        <t.icon size={20} />
+                        <span className="text-[12px] font-medium">{t.label}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              ))}
-            </div>
+
+                <div>
+                  <h3 className="t-sm font-semibold">Font size</h3>
+                  <p className="t-xs mb-3 mt-0.5 text-ink-faint">Adjust text size across the app</p>
+                  <div className="seg">
+                    {['small', 'medium', 'large'].map(size => (
+                      <button
+                        key={size}
+                        onClick={() => updateSettings({ fontSize: size })}
+                        aria-pressed={settings.fontSize === size}
+                        className={`seg-item capitalize ${settings.fontSize === size ? 'seg-item-active' : ''}`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="t-sm font-semibold">Layout</h3>
+                  <p className="t-xs mb-3 mt-0.5 text-ink-faint">Choose spacing density</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { key: 'comfortable', label: 'Comfortable', desc: 'More spacing' },
+                      { key: 'compact', label: 'Compact', desc: 'Tighter spacing' },
+                    ].map(l => (
+                      <button
+                        key={l.key}
+                        onClick={() => updateSettings({ layout: l.key })}
+                        aria-pressed={settings.layout === l.key}
+                        className={`rounded-[12px] border px-4 py-3 text-left transition-colors duration-150 ${
+                          settings.layout === l.key ? optionActive : optionIdle
+                        }`}
+                      >
+                        <span className="block text-[13px] font-semibold">{l.label}</span>
+                        <span className="text-[11px] opacity-70">{l.desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="t-sm font-semibold">Currency</h3>
+                  <p className="t-xs mb-3 mt-0.5 text-ink-faint">Display currency for amounts</p>
+                  <div className="grid grid-cols-4 gap-2">
+                    {['KES', 'USD', 'EUR', 'GBP'].map(c => (
+                      <button
+                        key={c}
+                        onClick={() => updateSettings({ currency: c })}
+                        aria-pressed={settings.currency === c}
+                        className={`${optionBase} mono text-[13px] font-semibold ${settings.currency === c ? optionActive : optionIdle}`}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'notifications' && (
+              <div>
+                <p className="t-xs -mt-2 mb-2 text-ink-faint">Choose which notifications you receive</p>
+                <div className="divide-y divide-hairline">
+                  {[
+                    { key: 'income', label: 'Income notifications' },
+                    { key: 'expense', label: 'Expense notifications' },
+                    { key: 'damage', label: 'Damage notifications' },
+                    { key: 'vehicle', label: 'Vehicle notifications' },
+                    { key: 'reports', label: 'Report notifications' },
+                    { key: 'system', label: 'System notifications' },
+                  ].map(n => {
+                    const enabled = !!settings.notificationPreferences[n.key]
+                    return (
+                      <div key={n.key} className="flex items-center justify-between gap-4 py-3">
+                        <span className="t-sm">{n.label}</span>
+                        <button
+                          role="switch"
+                          aria-checked={enabled}
+                          aria-label={n.label}
+                          onClick={() => {
+                            const prefs = { ...settings.notificationPreferences, [n.key]: !enabled }
+                            updateSettings({ notificationPreferences: prefs })
+                          }}
+                          className={`relative h-7 w-12 flex-shrink-0 rounded-full border transition-colors duration-200 ${
+                            enabled ? 'border-[var(--solid)] bg-[var(--solid)]' : 'border-hairline bg-ghost'
+                          }`}
+                        >
+                          <span
+                            className={`absolute top-[3px] h-[20px] w-[20px] rounded-full border transition-all duration-200 ${
+                              enabled
+                                ? 'left-[24px] border-transparent bg-[var(--solid-ink)]'
+                                : 'left-[3px] border-hairline-strong bg-panel'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'data' && (
+              <div>
+                <p className="t-xs -mt-2 mb-4 text-ink-faint">Export or delete your fleet data</p>
+                <div className="divide-y divide-hairline border-y border-hairline">
+                  <button
+                    onClick={handleExportData}
+                    className="flex w-full items-center gap-3 py-3.5 text-left transition-colors hover:bg-ghost"
+                  >
+                    <span className="tile">
+                      <HiOutlineArrowDownTray size={17} />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[13.5px] font-medium">Export all data</span>
+                      <span className="t-micro block text-ink-faint">Download a JSON backup</span>
+                    </span>
+                    <HiOutlineChevronRight size={16} className="flex-shrink-0 text-ink-faint" />
+                  </button>
+
+                  <button
+                    onClick={() => setShowDeleteData(true)}
+                    className="flex w-full items-center gap-3 py-3.5 text-left transition-colors hover:bg-ghost"
+                  >
+                    <span className="tile">
+                      <HiOutlineTrash size={17} />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[13.5px] font-medium">Delete all data</span>
+                      <span className="t-micro block text-ink-faint">Remove all vehicles and records</span>
+                    </span>
+                    <HiOutlineChevronRight size={16} className="flex-shrink-0 text-ink-faint" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'help' && (
+              <dl className="divide-y divide-hairline border-y border-hairline">
+                {[
+                  { label: 'About Fleet Manager', value: 'Version 2.0.0' },
+                  { label: 'Build', value: '2026.07' },
+                  { label: 'Made for', value: 'Fleet owners in Kenya' },
+                  { label: 'Contact', value: 'support@fleetmanager.app' },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center justify-between gap-4 py-3">
+                    <dt className="t-sm text-ink-soft">{item.label}</dt>
+                    <dd className="t-xs truncate font-medium">{item.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
           </div>
-        )}
+        </section>
       </div>
 
-      {/* Sign Out */}
-      <div className="mt-8">
+      {/* Sign out */}
+      <div className="mt-6">
         <SignOutButton>
-          <button className="w-full bg-transparent border border-danger/20 rounded-2xl p-4 text-danger font-medium text-[15px] flex items-center justify-center gap-2 hover:bg-danger/5 transition-all duration-200">
-            <HiOutlineArrowRightOnRectangle size={20} />
-            Sign Out
+          <button className="btn btn-outline btn-block text-ink-soft hover:text-ink sm:w-auto">
+            <HiOutlineArrowRightOnRectangle size={18} />
+            Sign out
           </button>
         </SignOutButton>
       </div>
 
-      {/* Delete Data Modal */}
+      {/* Delete data modal */}
       {showDeleteData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={() => setShowDeleteData(false)}>
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <div className="relative bg-[#1A2332] rounded-2xl w-full max-w-sm p-6 shadow-2xl border border-white/5" onClick={e => e.stopPropagation()}>
-            <div className="w-14 h-14 bg-danger/10 rounded-2xl flex items-center justify-center mb-4 mx-auto">
-              <HiOutlineTrash size={26} className="text-danger" />
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          onClick={() => setShowDeleteData(false)}
+        >
+          <div className="backdrop backdrop-enter" />
+          <div
+            className="modal sheet-enter"
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Delete all data"
+          >
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-hairline bg-panel-soft">
+              <HiOutlineTrash size={22} />
             </div>
-            <h3 className="text-[20px] font-semibold text-white text-center mb-2">Delete All Data?</h3>
-            <p className="text-[#94A3B8] text-[14px] text-center mb-6">This will permanently delete all vehicles, income, expenses, and damage records. This cannot be undone.</p>
-            <div className="flex gap-3">
-              <button onClick={() => setShowDeleteData(false)} className="flex-1 bg-white/5 hover:bg-white/10 text-white rounded-2xl h-[52px] font-medium text-[15px] transition-all duration-200">Cancel</button>
-              <button onClick={handleDeleteData} className="flex-1 bg-danger hover:bg-red-600 text-white rounded-2xl h-[52px] font-semibold text-[15px] transition-all duration-200">Delete All</button>
+            <h3 className="t-section text-center">Delete all data?</h3>
+            <p className="t-sm mt-2 text-center text-ink-soft">
+              This will permanently delete all vehicles, income, expenses and damage records.
+              This cannot be undone.
+            </p>
+            <div className="mt-6 flex gap-2.5">
+              <button onClick={() => setShowDeleteData(false)} className="btn btn-secondary flex-1">
+                Cancel
+              </button>
+              <button onClick={handleDeleteData} className="btn btn-primary flex-1">
+                Delete all
+              </button>
             </div>
           </div>
         </div>

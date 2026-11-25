@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useUser } from '@clerk/clerk-react'
 import api from '../services/api'
 import { formatCurrency, formatRelativeTime } from '../utils/formatters'
@@ -16,17 +16,19 @@ import {
   HiOutlineClock,
   HiOutlineWrenchScrewdriver,
   HiOutlineCheckCircle,
-  HiOutlineFire
+  HiOutlineFire,
+  HiOutlineChevronRight,
+  HiOutlineBanknotes
 } from 'react-icons/hi2'
 
 const activityIcons = {
-  income_added: { icon: HiOutlineCurrencyDollar, bg: 'bg-success/10', color: 'text-success' },
-  expense_added: { icon: HiOutlineReceiptPercent, bg: 'bg-danger/10', color: 'text-danger' },
-  damage_reported: { icon: HiOutlineExclamationTriangle, bg: 'bg-warning/10', color: 'text-warning' },
-  damage_fixed: { icon: HiOutlineCheckCircle, bg: 'bg-success/10', color: 'text-success' },
-  car_added: { icon: HiOutlinePlus, bg: 'bg-teal-500/10', color: 'text-teal-500' },
-  car_updated: { icon: HiOutlineWrenchScrewdriver, bg: 'bg-teal-500/10', color: 'text-teal-500' },
-  car_deleted: { icon: HiOutlineFire, bg: 'bg-danger/10', color: 'text-danger' },
+  income_added: HiOutlineCurrencyDollar,
+  expense_added: HiOutlineReceiptPercent,
+  damage_reported: HiOutlineExclamationTriangle,
+  damage_fixed: HiOutlineCheckCircle,
+  car_added: HiOutlinePlus,
+  car_updated: HiOutlineWrenchScrewdriver,
+  car_deleted: HiOutlineFire,
 }
 
 export default function Dashboard() {
@@ -77,13 +79,16 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="py-8">
-        <div className="skeleton h-16 w-48 rounded-2xl mb-4" />
-        <div className="skeleton h-6 w-64 rounded-xl mb-8" />
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          {[1, 2, 3, 4].map(i => <div key={i} className="skeleton h-[110px] rounded-2xl" />)}
+      <div className="py-2">
+        <div className="skeleton mb-4 h-4 w-28" />
+        <div className="skeleton mb-8 h-10 w-64" />
+        <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {[1, 2, 3, 4].map(i => <div key={i} className="skeleton h-[124px]" />)}
         </div>
-        <LoadingSkeleton lines={3} height="h-40" />
+        <div className="mb-8 grid grid-cols-3 gap-3">
+          {[1, 2, 3].map(i => <div key={i} className="skeleton h-[88px]" />)}
+        </div>
+        <LoadingSkeleton lines={3} height="h-32" />
       </div>
     )
   }
@@ -91,175 +96,255 @@ export default function Dashboard() {
   const firstName = user?.firstName || user?.fullName?.split(' ')[0] || 'there'
 
   const statCards = summary ? [
-    { label: "Today's Income", value: formatCurrency(summary.incomeThisMonth || 0), subtitle: 'This month', icon: HiOutlineCurrencyDollar, color: 'text-success', bg: 'bg-success/10' },
-    { label: "Today's Expenses", value: formatCurrency(summary.expensesThisMonth || 0), subtitle: 'This month', icon: HiOutlineReceiptPercent, color: 'text-danger', bg: 'bg-danger/10' },
-    { label: 'Net Profit', value: formatCurrency(summary.profitThisMonth || 0), subtitle: (summary.profitThisMonth || 0) >= 0 ? 'Positive margin' : 'Negative margin', icon: HiOutlineArrowTrendingUp, color: (summary.profitThisMonth || 0) >= 0 ? 'text-success' : 'text-danger', bg: (summary.profitThisMonth || 0) >= 0 ? 'bg-success/10' : 'bg-danger/10' },
-    { label: 'Active Cars', value: summary.activeCars || 0, subtitle: summary.damagedCars > 0 ? `${summary.damagedCars} damaged` : 'All healthy', icon: HiOutlineTruck, color: 'text-teal-500', bg: 'bg-teal-500/10' },
+    {
+      label: 'Net Profit',
+      value: formatCurrency(summary.profitThisMonth || 0),
+      subtitle: (summary.profitThisMonth || 0) >= 0 ? 'Positive margin' : 'Negative margin',
+      icon: HiOutlineArrowTrendingUp,
+      invert: true,
+    },
+    {
+      label: 'Income',
+      value: formatCurrency(summary.incomeThisMonth || 0),
+      subtitle: 'This month',
+      icon: HiOutlineCurrencyDollar,
+    },
+    {
+      label: 'Expenses',
+      value: formatCurrency(summary.expensesThisMonth || 0),
+      subtitle: 'This month',
+      icon: HiOutlineReceiptPercent,
+    },
+    {
+      label: 'Active Vehicles',
+      value: String(summary.activeCars ?? 0),
+      subtitle: summary.damagedCars > 0 ? `${summary.damagedCars} damaged` : 'All healthy',
+      icon: HiOutlineTruck,
+    },
   ] : []
 
   const quickActions = [
-    { label: 'Income', icon: HiOutlineCurrencyDollar, path: '/add-income', gradient: 'from-success/20 to-success/5', color: 'text-success' },
-    { label: 'Damage', icon: HiOutlineExclamationTriangle, path: '/add-damage', gradient: 'from-warning/20 to-warning/5', color: 'text-warning' },
-    { label: 'New Car', icon: HiOutlinePlus, path: '/cars', gradient: 'from-teal-500/20 to-teal-500/5', color: 'text-teal-500' },
+    { label: 'Income', hint: 'Record collection', icon: HiOutlineBanknotes, path: '/add-income' },
+    { label: 'Damage', hint: 'Report repair', icon: HiOutlineExclamationTriangle, path: '/add-damage' },
+    { label: 'New Car', hint: 'Add vehicle', icon: HiOutlinePlus, path: '/cars' },
   ]
+
+  const today = new Date().toLocaleDateString('en-KE', {
+    weekday: 'long', day: 'numeric', month: 'long'
+  })
 
   return (
     <div className="page-enter">
-      {/* ===== GREETING HEADER ===== */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-[28px] font-bold text-white tracking-tight">
-            {getGreeting()}, {firstName} 👋
+      {/* ===== HEADER ===== */}
+      <div className="mb-7 flex items-start justify-between gap-4 md:mb-9">
+        <div className="min-w-0">
+          <p className="t-label">{today}</p>
+          <h1 className="t-page mt-2 truncate">
+            {getGreeting()}, {firstName}
           </h1>
-          <p className="text-[#94A3B8] text-[15px] mt-1">Welcome back. Let's manage today's fleet.</p>
+          <p className="t-sm mt-1 text-ink-soft">
+            Welcome back. Here is how your fleet is performing.
+          </p>
         </div>
-        <button className="w-11 h-11 rounded-full bg-[#1A2332] border border-white/5 flex items-center justify-center relative shadow-lg shadow-black/10">
-          <HiOutlineBell size={20} className="text-[#94A3B8]" />
+        <Link
+          to="/notifications"
+          aria-label="Notifications"
+          className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[10px] border border-hairline bg-panel text-ink-soft transition-colors hover:border-hairline-strong hover:text-ink"
+        >
+          <HiOutlineBell size={19} />
           {summary?.damagedCars > 0 && (
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-danger rounded-full text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0B1120]">
+            <span className="absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-solid px-1 text-[9.5px] font-bold text-solid-ink ring-2 ring-canvas">
               {summary.damagedCars}
             </span>
           )}
-        </button>
+        </Link>
       </div>
 
-      {/* ===== STAT CARDS 2x2 ===== */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
-        {statCards.map((stat, i) => (
-          <div
-            key={i}
-            className="bg-[#1A2332] rounded-2xl p-5 border border-white/5 shadow-lg shadow-black/10 card-lift list-item-enter"
-            style={{ animationDelay: `${i * 80}ms` }}
-          >
-            <div className={`w-11 h-11 ${stat.bg} rounded-xl flex items-center justify-center mb-3`}>
-              <stat.icon size={22} className={stat.color} />
+      {/* ===== STAT CARDS ===== */}
+      <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
+        {statCards.map((stat, i) => {
+          const Icon = stat.icon
+          if (stat.invert) {
+            return (
+              <div key={i} className="card-invert list-item-enter p-4 sm:p-5" style={{ animationDelay: `${i * 50}ms` }}>
+                <div className="flex items-center justify-between">
+                  <p className="t-label text-[var(--solid-soft)]">{stat.label}</p>
+                  <Icon size={18} className="opacity-60" />
+                </div>
+                <p className="figure-lg mt-4 break-words text-[26px] sm:text-[30px] lg:text-[28px]">
+                  {stat.value}
+                </p>
+                <p className="t-xs mt-1.5 text-[var(--solid-soft)]">{stat.subtitle}</p>
+              </div>
+            )
+          }
+          return (
+            <div key={i} className="card list-item-enter p-4 sm:p-5" style={{ animationDelay: `${i * 50}ms` }}>
+              <div className="flex items-center justify-between">
+                <p className="t-label">{stat.label}</p>
+                <Icon size={18} className="text-ink-faint" />
+              </div>
+              <p className="figure mt-4 break-words text-[19px] sm:text-[21px]">{stat.value}</p>
+              <p className="t-xs mt-1.5 text-ink-faint">{stat.subtitle}</p>
             </div>
-            <p className="text-[11px] text-[#64748B] uppercase tracking-widest font-semibold">{stat.label}</p>
-            <p className={`mt-1.5 text-xl font-mono font-bold tracking-tight ${stat.color}`}>
-              {stat.value}
-            </p>
-            <p className="text-[#64748B] text-[11px] mt-0.5">{stat.subtitle}</p>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* ===== QUICK ACTIONS ===== */}
-      <div className="mb-8">
-        <h2 className="text-[20px] font-semibold text-white mb-4">Quick Actions</h2>
+      <div className="mt-8">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 className="t-section">Quick actions</h2>
+        </div>
         <div className="grid grid-cols-3 gap-3">
-          {quickActions.map((action, i) => (
+          {quickActions.map((action) => (
             <button
-              key={i}
+              key={action.label}
               onClick={() => navigate(action.path)}
-              className={`bg-gradient-to-br ${action.gradient} rounded-2xl py-5 px-3 flex flex-col items-center gap-2.5 border border-white/5 shadow-lg shadow-black/10 ripple btn-press`}
+              className="card card-interactive flex flex-col items-start gap-3 p-3.5 text-left transition-transform active:scale-[0.99] sm:p-4"
             >
-              <action.icon size={24} className={action.color} />
-              <span className="text-[12px] text-white font-medium">+ {action.label}</span>
+              <span className="tile">
+                <action.icon size={18} />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[13px] font-semibold leading-tight">+ {action.label}</span>
+                <span className="t-micro mt-0.5 hidden text-ink-faint sm:block">{action.hint}</span>
+              </span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* ===== YOUR CARS ===== */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[20px] font-semibold text-white">Your Cars</h2>
-          {cars.length > 0 && (
-            <button onClick={() => navigate('/cars')} className="text-teal-500 text-[14px] font-semibold">
-              View All
-            </button>
-          )}
-        </div>
-
-        {cars.length === 0 ? (
-          <EmptyState
-            icon={<HiOutlineTruck size={36} className="text-[#64748B] opacity-30" />}
-            title="No cars yet"
-            description="Add your first car to start tracking."
-            actionLabel="Add Your First Car"
-            onAction={() => navigate('/cars')}
-          />
-        ) : (
-          <div className="space-y-3">
-            {cars.slice(0, 3).map((car, index) => (
-              <button
-                key={car._id}
-                onClick={() => navigate(`/cars/${car._id}`)}
-                className="w-full bg-[#1A2332] rounded-2xl p-5 text-left border border-white/5 shadow-lg shadow-black/10 card-lift btn-press list-item-enter"
-                style={{ animationDelay: `${index * 60}ms` }}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-[18px] font-mono font-bold text-white tracking-wide">{car.plateNumber}</h3>
-                  <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1 rounded-full ${
-                    car.status === 'healthy' ? 'bg-[#065F46] text-success' : 'bg-[#7F1D1D] text-danger'
-                  }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${car.status === 'healthy' ? 'bg-success' : 'bg-danger'}`} />
-                    {car.status === 'healthy' ? 'Healthy' : 'Damaged'}
-                  </span>
-                </div>
-                <p className="text-[#94A3B8] text-[13px] mb-4">{car.driverName} · {car.passengerCapacity} pass.</p>
-                <div className="flex justify-between pt-4 border-t border-white/5">
-                  <div><p className="text-[#64748B] text-[10px] uppercase tracking-widest">Income</p><p className="text-white font-semibold text-[13px] mt-0.5">{formatCurrency(car.incomeThisMonth || 0)}</p></div>
-                  <div><p className="text-[#64748B] text-[10px] uppercase tracking-widest">Expenses</p><p className="text-white font-semibold text-[13px] mt-0.5">{formatCurrency(car.expensesThisMonth || 0)}</p></div>
-                  <div><p className="text-[#64748B] text-[10px] uppercase tracking-widest">Profit</p><p className={`font-semibold text-[13px] mt-0.5 ${(car.profitThisMonth || 0) >= 0 ? 'text-success' : 'text-danger'}`}>{formatCurrency(car.profitThisMonth || 0)}</p></div>
-                </div>
-              </button>
-            ))}
-            {cars.length > 3 && (
-              <button onClick={() => navigate('/cars')} className="w-full text-teal-500 text-[14px] font-semibold py-3 text-center">
-                + {cars.length - 3} more cars
-              </button>
+      {/* ===== CONTENT GRID ===== */}
+      <div className="mt-8 grid gap-6 lg:grid-cols-12 lg:gap-7">
+        {/* Your fleet */}
+        <section className="lg:col-span-7">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2 className="t-section">Your fleet</h2>
+            {cars.length > 0 && (
+              <Link to="/cars" className="t-sm font-medium text-ink-soft transition-colors hover:text-ink">
+                View all
+              </Link>
             )}
           </div>
-        )}
-      </div>
 
-      {/* ===== RECENT ACTIVITY ===== */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[20px] font-semibold text-white">Recent Activity</h2>
-          {activities.length > 0 && (
-            <HiOutlineClock size={18} className="text-[#64748B]" />
-          )}
-        </div>
+          <div className="card card-flush overflow-hidden">
+            {cars.length === 0 ? (
+              <EmptyState
+                icon={<HiOutlineTruck size={26} />}
+                title="No vehicles yet"
+                description="Add your first vehicle to start tracking income and repairs."
+                actionLabel="Add your first car"
+                onAction={() => navigate('/cars')}
+              />
+            ) : (
+              <div className="divide-y divide-hairline">
+                {cars.slice(0, 3).map((car, index) => {
+                  const healthy = car.status === 'healthy'
+                  return (
+                    <button
+                      key={car._id}
+                      onClick={() => navigate(`/cars/${car._id}`)}
+                      className="list-item-enter block w-full px-4 py-4 text-left transition-colors hover:bg-ghost sm:px-5"
+                      style={{ animationDelay: `${index * 40}ms` }}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="plate">{car.plateNumber}</span>
+                            <span className={`badge ${healthy ? 'badge-subtle' : 'badge-outline'}`}>
+                              {healthy
+                                ? <HiOutlineCheckCircle size={12} />
+                                : <HiOutlineExclamationTriangle size={12} />}
+                              {healthy ? 'Healthy' : 'Damaged'}
+                            </span>
+                          </div>
+                          <p className="t-xs mt-1.5 truncate text-ink-faint">
+                            {car.driverName} · {car.passengerCapacity} passengers
+                          </p>
+                        </div>
+                        <HiOutlineChevronRight size={17} className="mt-1 flex-shrink-0 text-ink-faint" />
+                      </div>
 
-        {activities.length === 0 ? (
-          <EmptyState
-            icon={<HiOutlineClock size={36} className="text-[#64748B] opacity-30" />}
-            title="No Activity Yet"
-            description="Your latest income, expenses, damages and new cars will appear here."
-            actionLabel="Add Income"
-            onAction={() => navigate('/add-income')}
-          />
-        ) : (
-          <div className="space-y-2">
-            {activities.map((activity, index) => {
-              const config = activityIcons[activity.type] || activityIcons.income_added
-              const Icon = config.icon
-              return (
-                <div
-                  key={activity._id}
-                  className="bg-[#1A2332] rounded-2xl p-4 border border-white/5 shadow-lg shadow-black/10 list-item-enter flex items-center gap-4"
-                  style={{ animationDelay: `${index * 40}ms` }}
-                >
-                  <div className={`w-10 h-10 ${config.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
-                    <Icon size={20} className={config.color} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white text-[14px] font-medium truncate">{activity.title}</p>
-                    <p className="text-[#94A3B8] text-[12px] truncate">
-                      {activity.description}
-                      {activity.plateNumber && <span className="text-[#64748B]"> · {activity.plateNumber}</span>}
-                    </p>
-                  </div>
-                  <span className="text-[#64748B] text-[11px] flex-shrink-0">
-                    {formatRelativeTime(activity.createdAt)}
-                  </span>
-                </div>
-              )
-            })}
+                      <div className="mt-4 grid grid-cols-3 gap-2 border-t border-hairline pt-3">
+                        <div>
+                          <p className="t-label text-[9.5px]">Income</p>
+                          <p className="figure-sm mt-1">{formatCurrency(car.incomeThisMonth || 0)}</p>
+                        </div>
+                        <div className="border-l border-hairline pl-3">
+                          <p className="t-label text-[9.5px]">Expenses</p>
+                          <p className="figure-sm mt-1">{formatCurrency(car.expensesThisMonth || 0)}</p>
+                        </div>
+                        <div className="border-l border-hairline pl-3">
+                          <p className="t-label text-[9.5px]">Profit</p>
+                          <p className={`figure-sm mt-1 ${(car.profitThisMonth || 0) < 0 ? 'text-ink-soft' : 'text-ink'}`}>
+                            {formatCurrency(car.profitThisMonth || 0)}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
           </div>
-        )}
+
+          {cars.length > 3 && (
+            <Link
+              to="/cars"
+              className="mt-3 flex h-10 items-center justify-center rounded-[10px] border border-hairline text-[12.5px] font-medium text-ink-soft transition-colors hover:bg-ghost hover:text-ink"
+            >
+              {cars.length - 3} more vehicles
+            </Link>
+          )}
+        </section>
+
+        {/* Recent activity */}
+        <section className="lg:col-span-5">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2 className="t-section">Recent activity</h2>
+            <HiOutlineClock size={16} className="text-ink-faint" />
+          </div>
+
+          <div className="card card-flush overflow-hidden">
+            {activities.length === 0 ? (
+              <EmptyState
+                icon={<HiOutlineClock size={26} />}
+                title="No activity yet"
+                description="Income, expenses, damages and new vehicles will appear here."
+                actionLabel="Add income"
+                onAction={() => navigate('/add-income')}
+              />
+            ) : (
+              <div className="divide-y divide-hairline">
+                {activities.map((activity, index) => {
+                  const Icon = activityIcons[activity.type] || activityIcons.income_added
+                  return (
+                    <div
+                      key={activity._id}
+                      className="list-item-enter flex items-center gap-3 px-4 py-3.5 sm:px-5"
+                      style={{ animationDelay: `${index * 30}ms` }}
+                    >
+                      <span className="tile h-8 w-8 rounded-[9px]">
+                        <Icon size={16} />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[13px] font-medium">{activity.title}</p>
+                        <p className="t-xs truncate text-ink-faint">
+                          {activity.description}
+                          {activity.plateNumber && <span className="mono"> · {activity.plateNumber}</span>}
+                        </p>
+                      </div>
+                      <span className="t-micro flex-shrink-0 text-ink-faint">
+                        {formatRelativeTime(activity.createdAt)}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   )

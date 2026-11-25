@@ -1,5 +1,6 @@
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { UserButton } from '@clerk/clerk-react'
+import BrandMark from './BrandMark'
 import {
   HiOutlineHome,
   HiOutlineCurrencyDollar,
@@ -13,56 +14,66 @@ import {
 const navItems = [
   { path: '/', label: 'Dashboard', Icon: HiOutlineHome },
   { path: '/add-income', label: 'Add Income', Icon: HiOutlineCurrencyDollar },
-  { path: '/add-damage', label: 'Add Damage', Icon: HiOutlineExclamationTriangle },
-  { path: '/cars', label: 'My Cars', Icon: HiOutlineTruck },
+  { path: '/add-damage', label: 'Vehicle Health', Icon: HiOutlineExclamationTriangle },
+  { path: '/cars', label: 'My Fleet', Icon: HiOutlineTruck },
   { path: '/reports', label: 'Reports', Icon: HiOutlineChartBar },
   { path: '/profile', label: 'Profile', Icon: HiOutlineUser },
 ]
 
-export default function Sidebar() {
-  const location = useLocation()
+const linkBase =
+  'flex h-10 items-center gap-3 rounded-[10px] px-3 text-[13.5px] font-medium transition-colors duration-150'
+const linkIdle = 'text-ink-soft hover:bg-ghost hover:text-ink'
+const linkActive = 'bg-solid text-solid-ink'
 
+export default function Sidebar() {
   return (
-    <aside className="hidden lg:flex flex-col w-60 min-h-screen bg-[#111827] border-r border-white/5">
+    <aside className="fixed inset-y-0 left-0 z-40 hidden w-[236px] flex-col border-r border-hairline bg-canvas-soft md:flex">
       {/* Brand */}
-      <div className="flex items-center px-5 h-16 border-b border-white/5 gap-2.5">
-        <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-teal-600 rounded-[10px] flex items-center justify-center shadow-lg shadow-teal-500/20 flex-shrink-0">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-            <path d="M13 5l3 5m0 0h2.5a1.5 1.5 0 011.423 1.026L21 14H3l1.077-2.974A1.5 1.5 0 015.5 10H8m5 0H8m5 0v5H8V10" />
-          </svg>
+      <div className="flex h-16 items-center gap-2.5 px-5">
+        <BrandMark size={32} iconSize={17} radius={9} />
+        <div className="leading-tight">
+          <p className="text-[14.5px] font-semibold tracking-tight">Fleet Manager</p>
+          <p className="text-[10px] uppercase tracking-[0.14em] text-ink-faint">Operations</p>
         </div>
-        <span className="text-white font-semibold text-[17px] tracking-tight">Fleet Manager</span>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 py-6 px-3 space-y-1">
-        {navItems.map(({ path, label, Icon }) => {
-          const isActive = location.pathname === path
-          return (
+      <nav className="flex-1 px-3 py-4">
+        <p className="t-label mb-2 px-3">Workspace</p>
+        <div className="space-y-0.5">
+          {navItems.map(({ path, label, Icon }) => (
             <NavLink
               key={path}
               to={path}
-              className={`flex items-center gap-3 px-3 h-11 rounded-xl text-[14px] font-medium transition-all duration-200 ${
-                isActive ? 'bg-teal-500/10 text-teal-500' : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
-              }`}
+              end={path === '/'}
+              className={({ isActive }) =>
+                `${linkBase} ${isActive ? linkActive : linkIdle}`
+              }
             >
-              <Icon size={20} />
+              <Icon size={19} strokeWidth={1.8} />
               {label}
             </NavLink>
-          )
-        })}
+          ))}
+        </div>
+
+        <p className="t-label mb-2 mt-7 px-3">Activity</p>
+        <NavLink
+          to="/notifications"
+          className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkIdle}`}
+        >
+          <HiOutlineBell size={19} strokeWidth={1.8} />
+          Notifications
+        </NavLink>
       </nav>
 
-      {/* Bottom */}
-      <div className="px-5 py-4 border-t border-white/5 space-y-3">
-        <button className="w-full flex items-center gap-3 px-2 py-2 rounded-xl text-[#94A3B8] hover:text-white hover:bg-white/5 transition-all duration-200 text-[14px]">
-          <HiOutlineBell size={20} />
-          Notifications
-        </button>
-        <div className="flex items-center gap-3 px-2 py-1">
-          <UserButton afterSignOutUrl="/" />
-          <span className="text-[#94A3B8] text-[14px]">Account</span>
+      {/* Account */}
+      <div className="border-t border-hairline p-3">
+        <div className="flex items-center gap-3 rounded-[10px] px-2 py-2">
+          <UserButton />
+          <div className="min-w-0 leading-tight">
+            <p className="text-[13px] font-medium">Account</p>
+            <p className="text-[11px] text-ink-faint">Signed in</p>
+          </div>
         </div>
       </div>
     </aside>

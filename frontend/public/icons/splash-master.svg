@@ -1,18 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#111827"/>
-  <!-- Teal glow -->
-  <circle cx="256" cy="200" r="120" fill="#14B8A6" opacity="0.15"/>
-  <circle cx="256" cy="200" r="80" fill="#14B8A6" opacity="0.1"/>
-  <!-- Car icon (teal + white) -->
-  <g transform="translate(256, 200)" fill="none" stroke="#14B8A6" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="-70" y="-35" width="140" height="70" rx="14"/>
-    <circle cx="-50" cy="40" r="18"/>
-    <circle cx="50" cy="40" r="18"/>
-    <rect x="-55" y="-52" width="110" height="24" rx="12"/>
-    <line x1="-42" y1="-35" x2="-42" y2="-52"/>
-    <line x1="42" y1="-35" x2="42" y2="-52"/>
+  <rect width="512" height="512" fill="#090909"/>
+  <g transform="translate(256, 214)" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="-76" y="-30" width="152" height="62" rx="16"/>
+    <path d="M-52 -30 L-38 -60 H38 L52 -30"/>
+    <line x1="-26" y1="-60" x2="-26" y2="-30"/>
+    <line x1="26" y1="-60" x2="26" y2="-30"/>
+    <circle cx="-48" cy="41" r="17"/>
+    <circle cx="48" cy="41" r="17"/>
   </g>
-  <!-- App Name -->
-  <text x="256" y="350" text-anchor="middle" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="36" font-weight="bold">Fleet Manager</text>
-  <text x="256" y="385" text-anchor="middle" fill="#9CA3AF" font-family="Arial, sans-serif" font-size="18">Track your fleet. Know your profit.</text>
+  <text x="256" y="340" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="700" letter-spacing="1">Fleet Manager</text>
+  <text x="256" y="378" text-anchor="middle" fill="#8A8A8A" font-family="Inter, Arial, sans-serif" font-size="17" letter-spacing="0.5">Track your fleet. Know your profit.</text>
 </svg>

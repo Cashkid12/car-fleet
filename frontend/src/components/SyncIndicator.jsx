@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react'
 import offlineSync from '../utils/offlineSync'
-import { HiOutlineCloud, HiOutlineCloudArrowUp, HiOutlineCheckCircle, HiOutlineExclamationTriangle, HiOutlineWifi } from 'react-icons/hi2'
+import {
+  HiOutlineArrowPath,
+  HiOutlineCheckCircle,
+  HiOutlineExclamationTriangle,
+  HiOutlineWifi
+} from 'react-icons/hi2'
 
 export default function SyncIndicator() {
   const [status, setStatus] = useState('online')
@@ -39,22 +44,29 @@ export default function SyncIndicator() {
   if (!visible && status === 'online') return null
 
   const configs = {
-    offline: { icon: HiOutlineWifi, bg: 'bg-warning/90', text: 'text-black', message: 'Offline — changes saved locally' },
-    syncing: { icon: HiOutlineCloudArrowUp, bg: 'bg-teal-500/90', text: 'text-white', message: `Syncing ${pendingCount > 0 ? `${pendingCount} item${pendingCount > 1 ? 's' : ''}` : '...'}` },
-    online: { icon: HiOutlineCheckCircle, bg: 'bg-success/90', text: 'text-white', message: 'All changes synced' },
-    error: { icon: HiOutlineExclamationTriangle, bg: 'bg-danger/90', text: 'text-white', message: 'Sync failed — retrying...' },
+    offline: { icon: HiOutlineWifi, message: 'Offline — changes saved locally' },
+    syncing: { icon: HiOutlineArrowPath, message: `Syncing ${pendingCount > 0 ? `${pendingCount} item${pendingCount > 1 ? 's' : ''}` : '...'}` },
+    online: { icon: HiOutlineCheckCircle, message: 'All changes synced' },
+    error: { icon: HiOutlineExclamationTriangle, message: 'Sync failed — retrying...' },
   }
 
   const config = configs[status]
   const Icon = config.icon
 
   return (
-    <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full ${config.bg} ${config.text} text-[12px] font-semibold flex items-center gap-2 shadow-2xl transition-all duration-300`}>
-      <Icon size={16} />
-      <span>{config.message}</span>
-      {status === 'error' && (
-        <button onClick={() => offlineSync.syncPending()} className="underline ml-1">Retry</button>
-      )}
+    <div className="pointer-events-none fixed inset-x-0 bottom-[88px] z-50 flex justify-center px-4 md:bottom-6">
+      <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-hairline bg-panel/95 px-3.5 py-2 text-[12px] font-medium text-ink shadow-[var(--nav-shadow)] backdrop-blur-xl">
+        <Icon
+          size={15}
+          className={`text-ink-soft ${status === 'syncing' ? 'animate-spin' : ''}`}
+        />
+        <span>{config.message}</span>
+        {status === 'error' && (
+          <button onClick={() => offlineSync.syncPending()} className="underline underline-offset-2">
+            Retry
+          </button>
+        )}
+      </div>
     </div>
   )
 }

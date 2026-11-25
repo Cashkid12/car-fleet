@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { SignedIn, SignedOut, SignInButton, SignUpButton } from '@clerk/clerk-react'
 import { ToastProvider } from './components/Toast'
 import BottomNav from './components/BottomNav'
+import BrandMark from './components/BrandMark'
 import Sidebar from './components/Sidebar'
 import AppHeader from './components/AppHeader'
 import FAB from './components/FAB'
@@ -31,25 +32,25 @@ function AppLayout({ children }) {
   const pageInfo = pageTitles[location.pathname] || { title: 'Fleet Manager', subtitle: '' }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#0B1120] text-white lg:flex-row">
+    <div className="flex min-h-screen bg-canvas text-ink">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-h-screen lg:min-h-0 lg:ml-60">
-        <div className="lg:hidden sticky top-0 z-40">
+      <div className="flex min-h-screen flex-1 flex-col md:ml-[236px]">
+        <div className="sticky top-0 z-40 md:hidden">
           <AppHeader title={pageInfo.title} subtitle={pageInfo.subtitle} />
         </div>
         <OfflineBanner />
-        <div className="flex-1 overflow-y-auto safe-bottom lg:pb-8">
-          <div className="max-w-[480px] mx-auto w-full px-5 pt-6">
+        <main className="flex-1 pb-28 md:pb-12">
+          <div className="mx-auto w-full max-w-[1400px] px-4 pt-5 sm:px-6 md:px-8 md:pt-8 lg:px-10 lg:pt-10">
             {children}
           </div>
-        </div>
+        </main>
         {location.pathname !== '/cars/:id' && !location.pathname.startsWith('/cars/') && (
-          <div className="lg:hidden">
+          <div className="md:hidden">
             <FAB />
           </div>
         )}
         <SyncIndicator />
-        <div className="lg:hidden">
+        <div className="md:hidden">
           <BottomNav />
         </div>
       </div>
@@ -59,27 +60,60 @@ function AppLayout({ children }) {
 
 function LoginScreen() {
   return (
-    <div className="min-h-screen bg-[#0B1120] flex flex-col items-center justify-center px-6 relative overflow-hidden">
-      <div className="absolute top-[-200px] right-[-150px] w-[450px] h-[450px] rounded-full bg-teal-500/5 blur-[140px]" />
-      <div className="absolute bottom-[-150px] left-[-120px] w-[350px] h-[350px] rounded-full bg-teal-500/4 blur-[120px]" />
-      <div className="relative z-10 w-full max-w-[340px]">
-        <div className="flex justify-center mb-12">
-          <div className="w-[100px] h-[100px] bg-gradient-to-br from-teal-500 to-teal-600 rounded-[28px] flex items-center justify-center shadow-2xl shadow-teal-500/20 ring-1 ring-teal-500/20">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-              <path d="M13 5l3 5m0 0h2.5a1.5 1.5 0 011.423 1.026L21 14H3l1.077-2.974A1.5 1.5 0 015.5 10H8m5 0H8m5 0v5H8V10" />
-            </svg>
+    <div className="flex min-h-screen flex-col bg-canvas text-ink">
+      <header className="px-6 py-6 sm:px-10">
+        <div className="flex items-center gap-2.5">
+          <BrandMark size={30} iconSize={16} radius={8} />
+          <span className="text-[15px] font-semibold tracking-tight">Fleet Manager</span>
+        </div>
+      </header>
+
+      <div className="flex flex-1 items-center justify-center px-6 pb-16 sm:px-10">
+        <div className="w-full max-w-[880px] lg:grid lg:grid-cols-2 lg:items-center lg:gap-20">
+          <div className="mb-12 lg:mb-0">
+            <p className="t-label mb-5">Fleet operations</p>
+            <h1 className="t-display max-w-[12ch] sm:text-[40px]">
+              Track your fleet. Know your profit.
+            </h1>
+            <p className="t-body mt-5 max-w-[36ch] text-ink-soft">
+              Income, expenses, repairs and vehicle health — one calm dashboard for the whole
+              fleet.
+            </p>
+            <div className="mt-10 hidden items-center gap-8 lg:flex">
+              <div>
+                <p className="figure text-[24px]">KES</p>
+                <p className="t-xs mt-1 text-ink-faint">Native currency</p>
+              </div>
+              <div className="h-10 w-px bg-hairline" />
+              <div>
+                <p className="figure text-[24px]">Offline</p>
+                <p className="t-xs mt-1 text-ink-faint">Syncs when back online</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full max-w-[380px] lg:justify-self-end">
+            <div className="rounded-[18px] border border-hairline bg-panel p-6 shadow-[var(--card-shadow)] sm:p-7">
+              <h2 className="t-cardtitle">Sign in to continue</h2>
+              <p className="t-sm mt-1 text-ink-soft">
+                Manage your fleet. Track every shilling.
+              </p>
+
+              <div className="mt-6 space-y-2.5">
+                <SignInButton mode="modal">
+                  <button className="btn btn-primary btn-lg btn-block">Sign In</button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button className="btn btn-outline btn-lg btn-block">Create Account</button>
+                </SignUpButton>
+              </div>
+
+              <p className="t-xs mt-6 text-ink-faint">
+                Secured by Clerk. Your fleet data stays private to your account.
+              </p>
+            </div>
           </div>
         </div>
-        <h1 className="text-center text-[32px] font-bold text-white tracking-tight leading-tight mb-2">Fleet Manager</h1>
-        <p className="text-center text-[15px] text-teal-400/80 font-medium mb-16">Track your fleet. Know your profit.</p>
-        <SignInButton mode="modal">
-          <button className="w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-2xl h-[56px] text-[15px] transition-all duration-200 mb-3 shadow-lg shadow-teal-500/15 ripple btn-press">Sign In</button>
-        </SignInButton>
-        <SignUpButton mode="modal">
-          <button className="w-full bg-transparent border border-white/10 hover:border-teal-500/40 text-white/80 hover:text-teal-400 font-semibold rounded-2xl h-[56px] text-[15px] hover:bg-teal-500/5 transition-all duration-200 ripple btn-press">Create Account</button>
-        </SignUpButton>
-        <p className="text-center text-[#64748B] text-xs mt-12 tracking-wide">Manage your fleet. Track every shilling.</p>
       </div>
     </div>
   )

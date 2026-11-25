@@ -21,25 +21,32 @@ export default function BottomNav() {
   const location = useLocation()
 
   return (
-    <nav className="fixed bottom-4 left-4 right-4 z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      <div className="bg-[#111827] rounded-[24px] flex justify-around items-center h-[72px] border border-white/5 shadow-2xl shadow-black/40 max-w-[480px] mx-auto">
+    <nav
+      className="fixed inset-x-3 bottom-3 z-50"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
+      <div className="mx-auto flex h-[62px] max-w-[440px] items-stretch gap-0.5 rounded-[20px] border border-hairline bg-panel/95 px-1.5 shadow-[var(--nav-shadow)] backdrop-blur-xl">
         {navItems.map(({ path, label, Icon }) => {
           const isActive = location.pathname === path
           return (
             <NavLink
               key={path}
               to={path}
-              className="flex flex-col items-center justify-center flex-1 h-full relative transition-all duration-200"
+              className="flex flex-1 flex-col items-center justify-center gap-1"
+              aria-label={label}
             >
-              {isActive && (
-                <div className="absolute top-2 w-8 h-1 bg-teal-500 rounded-full nav-active-indicator" />
-              )}
-              <Icon
-                size={20}
-                strokeWidth={isActive ? 2.5 : 2}
-                className={`transition-all duration-300 ${isActive ? 'text-teal-500 scale-110' : 'text-[#64748B]'}`}
-              />
-              <span className={`text-[10px] mt-1 font-semibold tracking-wide transition-all duration-300 ${isActive ? 'text-teal-500' : 'text-[#64748B]'}`}>
+              <span
+                className={`grid h-7 w-9 place-items-center rounded-[8px] transition-colors duration-200 ${
+                  isActive ? 'bg-solid text-solid-ink' : 'text-ink-faint'
+                }`}
+              >
+                <Icon size={17} strokeWidth={isActive ? 2.2 : 1.9} />
+              </span>
+              <span
+                className={`text-[9.5px] leading-none tracking-wide transition-colors duration-200 ${
+                  isActive ? 'font-semibold text-ink' : 'text-ink-faint'
+                }`}
+              >
                 {label}
               </span>
             </NavLink>

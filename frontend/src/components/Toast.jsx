@@ -1,11 +1,13 @@
 import { createContext, useContext, useState, useCallback } from 'react'
-import { HiOutlineCheckCircle, HiOutlineXCircle, HiOutlineExclamationTriangle } from 'react-icons/hi2'
+import { HiOutlineCheckCircle, HiOutlineXCircle, HiOutlineInformationCircle } from 'react-icons/hi2'
 
 const ToastContext = createContext(null)
 
-const iconMap = { success: HiOutlineCheckCircle, error: HiOutlineXCircle, info: HiOutlineExclamationTriangle }
-const borderMap = { success: 'border-l-teal-500', error: 'border-l-danger', info: 'border-l-warning' }
-const iconColorMap = { success: 'text-teal-500', error: 'text-danger', info: 'text-warning' }
+const iconMap = {
+  success: HiOutlineCheckCircle,
+  error: HiOutlineXCircle,
+  info: HiOutlineInformationCircle
+}
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([])
@@ -19,13 +21,20 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={{ addToast }}>
       {children}
-      <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none max-w-[calc(100vw-2rem)]">
+      <div className="pointer-events-none fixed right-3 top-3 z-[100] flex w-full max-w-[340px] flex-col gap-2 sm:right-5 sm:top-5">
         {toasts.map(toast => {
           const Icon = iconMap[toast.type] || iconMap.info
           return (
-            <div key={toast.id} className={`toast-enter px-4 py-3.5 rounded-2xl shadow-2xl text-white text-[14px] font-medium pointer-events-auto flex items-center gap-2.5 bg-[#1A2332] border-l-4 ${borderMap[toast.type] || borderMap.info} border border-white/5`}>
-              <Icon size={20} className={iconColorMap[toast.type] || iconColorMap.info} />
-              {toast.message}
+            <div
+              key={toast.id}
+              role="status"
+              className="toast-enter pointer-events-auto flex items-center gap-2.5 rounded-[12px] border border-hairline border-l-2 border-l-ink bg-panel px-3.5 py-3 text-[13px] font-medium text-ink shadow-[0_16px_40px_-20px_rgba(0,0,0,0.6)]"
+            >
+              <Icon
+                size={18}
+                className={toast.type === 'error' ? 'text-ink' : 'text-ink-soft'}
+              />
+              <span className="min-w-0">{toast.message}</span>
             </div>
           )
         })}

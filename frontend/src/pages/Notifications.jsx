@@ -2,11 +2,9 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import { formatRelativeTime } from '../utils/formatters'
-import { LoadingSkeleton } from '../components/LoadingSpinner'
 import EmptyState from '../components/EmptyState'
 import {
   HiOutlineBell,
-  HiOutlineBellAlert,
   HiOutlineCheck,
   HiOutlineTrash,
   HiOutlineMagnifyingGlass,
@@ -30,26 +28,26 @@ const FILTERS = [
 ]
 
 const notificationIcons = {
-  income_added: { icon: HiOutlineCurrencyDollar, bg: 'bg-success/10', color: 'text-success' },
-  income_updated: { icon: HiOutlineCurrencyDollar, bg: 'bg-success/10', color: 'text-success' },
-  income_deleted: { icon: HiOutlineCurrencyDollar, bg: 'bg-danger/10', color: 'text-danger' },
-  expense_added: { icon: HiOutlineChartBar, bg: 'bg-danger/10', color: 'text-danger' },
-  expense_updated: { icon: HiOutlineChartBar, bg: 'bg-danger/10', color: 'text-danger' },
-  expense_deleted: { icon: HiOutlineChartBar, bg: 'bg-danger/10', color: 'text-danger' },
-  damage_reported: { icon: HiOutlineExclamationTriangle, bg: 'bg-warning/10', color: 'text-warning' },
-  repair_started: { icon: HiOutlineWrenchScrewdriver, bg: 'bg-warning/10', color: 'text-warning' },
-  repair_completed: { icon: HiOutlineCheckCircle, bg: 'bg-success/10', color: 'text-success' },
-  vehicle_added: { icon: HiOutlineTruck, bg: 'bg-teal-500/10', color: 'text-teal-500' },
-  vehicle_updated: { icon: HiOutlineTruck, bg: 'bg-teal-500/10', color: 'text-teal-500' },
-  vehicle_deleted: { icon: HiOutlineTruck, bg: 'bg-danger/10', color: 'text-danger' },
-  report_generated: { icon: HiOutlineChartBar, bg: 'bg-teal-500/10', color: 'text-teal-500' },
-  system_message: { icon: HiOutlineInformationCircle, bg: 'bg-white/5', color: 'text-[#94A3B8]' },
+  income_added: HiOutlineCurrencyDollar,
+  income_updated: HiOutlineCurrencyDollar,
+  income_deleted: HiOutlineCurrencyDollar,
+  expense_added: HiOutlineChartBar,
+  expense_updated: HiOutlineChartBar,
+  expense_deleted: HiOutlineChartBar,
+  damage_reported: HiOutlineExclamationTriangle,
+  repair_started: HiOutlineWrenchScrewdriver,
+  repair_completed: HiOutlineCheckCircle,
+  vehicle_added: HiOutlineTruck,
+  vehicle_updated: HiOutlineTruck,
+  vehicle_deleted: HiOutlineTruck,
+  report_generated: HiOutlineChartBar,
+  system_message: HiOutlineInformationCircle,
 }
 
-const priorityColors = {
-  high: 'bg-danger text-white',
-  medium: 'bg-warning/20 text-warning',
-  low: 'bg-white/5 text-[#94A3B8]',
+const priorityStyles = {
+  high: 'badge-solid',
+  medium: 'badge-outline',
+  low: 'badge-subtle',
 }
 
 export default function Notifications() {
@@ -111,150 +109,189 @@ export default function Notifications() {
 
   if (loading) {
     return (
-      <div className="px-5 py-8 max-w-2xl mx-auto">
-        <div className="skeleton h-10 w-40 rounded-xl mb-2" />
-        <div className="skeleton h-5 w-56 rounded-xl mb-8" />
-        {[1,2,3,4,5].map(i => <div key={i} className="skeleton h-24 rounded-2xl mb-3" />)}
+      <div>
+        <div className="skeleton mb-2 h-9 w-48" />
+        <div className="skeleton mb-6 h-4 w-56" />
+        <div className="mb-6 grid grid-cols-3 gap-3">
+          {[1, 2, 3].map(i => <div key={i} className="skeleton h-[88px]" />)}
+        </div>
+        <div className="skeleton mb-4 h-12 w-full" />
+        {[1, 2, 3, 4].map(i => <div key={i} className="skeleton mb-2 h-24" />)}
       </div>
     )
   }
 
   const totalNotifications = Object.values(notifications).flat().length
+  const counters = [
+    { label: 'Unread', value: unreadCount },
+    { label: 'Today', value: todayCount },
+    { label: 'Total', value: totalCount },
+  ]
 
   return (
-    <div className="page-enter max-w-2xl mx-auto px-5 py-8">
+    <div className="page-enter">
       {/* Header */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-[28px] font-bold text-white tracking-tight">Notifications</h1>
-          <p className="text-[#94A3B8] text-[15px] mt-1">Stay updated with your fleet</p>
+          <h1 className="t-page">Notifications</h1>
+          <p className="t-sm mt-1 text-ink-soft">Stay updated with your fleet.</p>
         </div>
         {totalNotifications > 0 && (
-          <button onClick={handleMarkAllRead} className="text-teal-500 text-[14px] font-semibold flex items-center gap-1">
-            <HiOutlineCheck size={18} /> Mark All Read
+          <button onClick={handleMarkAllRead} className="btn btn-secondary btn-sm">
+            <HiOutlineCheck size={15} />
+            Mark all read
           </button>
         )}
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-3 mb-6 mt-6">
-        <div className="bg-[#1A2332] rounded-2xl p-4 border border-white/5 text-center">
-          <p className="text-2xl font-bold text-white">{unreadCount}</p>
-          <p className="text-[#64748B] text-[11px] uppercase tracking-widest mt-1">Unread</p>
-        </div>
-        <div className="bg-[#1A2332] rounded-2xl p-4 border border-white/5 text-center">
-          <p className="text-2xl font-bold text-white">{todayCount}</p>
-          <p className="text-[#64748B] text-[11px] uppercase tracking-widest mt-1">Today</p>
-        </div>
-        <div className="bg-[#1A2332] rounded-2xl p-4 border border-white/5 text-center">
-          <p className="text-2xl font-bold text-white">{totalCount}</p>
-          <p className="text-[#64748B] text-[11px] uppercase tracking-widest mt-1">Total</p>
-        </div>
-      </div>
-
-      {/* Search */}
-      <div className="relative mb-4">
-        <HiOutlineMagnifyingGlass size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search notifications..."
-          className="w-full bg-[#1A2332] text-white rounded-2xl pl-12 pr-12 h-[56px] border border-white/5 focus:border-teal-500 focus:outline-none text-[15px] placeholder-[#64748B] transition-all duration-200"
-        />
-        {search && (
-          <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-white">
-            <HiOutlineXMark size={18} />
-          </button>
-        )}
-      </div>
-
-      {/* Filters */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
-        {FILTERS.map(f => (
-          <button
-            key={f.key}
-            onClick={() => setActiveFilter(f.key)}
-            className={`flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-semibold transition-all duration-200 ${
-              activeFilter === f.key ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/20' : 'bg-[#1A2332] text-[#94A3B8] border border-white/5'
-            }`}
-          >
-            {f.label}
-          </button>
+      {/* Counters */}
+      <div className="mb-6 grid grid-cols-3 gap-3">
+        {counters.map((counter) => (
+          <div key={counter.label} className="card p-4">
+            <p className="figure text-[22px]">{counter.value}</p>
+            <p className="t-label mt-1.5">{counter.label}</p>
+          </div>
         ))}
       </div>
 
-      {/* Clear All */}
+      {/* Search + filters */}
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
+        <div className="relative w-full lg:max-w-[360px]">
+          <HiOutlineMagnifyingGlass
+            size={18}
+            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-faint"
+          />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search notifications"
+            aria-label="Search notifications"
+            className="field pl-11 pr-11"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch('')}
+              aria-label="Clear search"
+              className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-[8px] text-ink-faint transition-colors hover:bg-ghost hover:text-ink"
+            >
+              <HiOutlineXMark size={17} />
+            </button>
+          )}
+        </div>
+
+        <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+          {FILTERS.map(f => (
+            <button
+              key={f.key}
+              onClick={() => setActiveFilter(f.key)}
+              className={`pill flex-shrink-0 ${activeFilter === f.key ? 'pill-active' : ''}`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* List header */}
       {totalNotifications > 0 && (
-        <button onClick={handleClearAll} className="text-[#64748B] text-[13px] hover:text-danger transition-colors duration-150 mb-4 flex items-center gap-1">
-          <HiOutlineTrash size={14} /> Clear All
-        </button>
+        <div className="mb-2 flex items-center justify-between">
+          <p className="t-label">{totalNotifications} notifications</p>
+          <button
+            onClick={handleClearAll}
+            className="btn btn-ghost btn-sm text-ink-faint hover:text-ink"
+          >
+            <HiOutlineTrash size={14} />
+            Clear all
+          </button>
+        </div>
       )}
 
-      {/* Notifications List */}
+      {/* Notifications */}
       {totalNotifications === 0 ? (
-        <EmptyState
-          icon={<HiOutlineBell size={40} className="text-[#64748B] opacity-20" />}
-          title="No Notifications"
-          description="You're all caught up."
-        />
+        <div className="card p-0">
+          <EmptyState
+            icon={<HiOutlineBell size={26} />}
+            title="No notifications"
+            description="You're all caught up."
+          />
+        </div>
       ) : (
         <div className="space-y-6">
           {Object.entries(notifications).map(([group, items]) => (
-            <div key={group}>
-              <h3 className="text-[14px] font-semibold text-[#64748B] uppercase tracking-wider mb-3">{group}</h3>
-              <div className="space-y-2">
-                {items.map(notification => {
-                  const config = notificationIcons[notification.type] || notificationIcons.system_message
-                  const Icon = config.icon
-                  return (
-                    <div
-                      key={notification._id}
-                      onClick={() => handleNotificationClick(notification)}
-                      className={`bg-[#1A2332] rounded-2xl p-4 border cursor-pointer transition-all duration-200 hover:border-white/10 list-item-enter ${
-                        !notification.isRead ? 'border-l-2 border-l-teal-500' : 'border-white/5'
-                      }`}
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className={`w-10 h-10 ${config.bg} rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                          <Icon size={20} className={config.color} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-0.5">
-                            <p className={`text-[14px] font-semibold ${!notification.isRead ? 'text-white' : 'text-[#94A3B8]'}`}>
+            <section key={group}>
+              <h2 className="t-label mb-2">{group}</h2>
+              <div className="card card-flush overflow-hidden">
+                <div className="divide-y divide-hairline">
+                  {items.map(notification => {
+                    const Icon = notificationIcons[notification.type] || notificationIcons.system_message
+                    return (
+                      <div
+                        key={notification._id}
+                        onClick={() => handleNotificationClick(notification)}
+                        className={`relative flex cursor-pointer items-start gap-3 px-4 py-4 transition-colors hover:bg-ghost sm:px-5 ${
+                          !notification.isRead ? 'bg-panel-soft/30' : ''
+                        }`}
+                      >
+                        {!notification.isRead && (
+                          <span className="absolute inset-y-0 left-0 w-[2px] bg-ink" aria-hidden="true" />
+                        )}
+
+                        <span className="tile h-9 w-9 rounded-[10px]">
+                          <Icon size={16} />
+                        </span>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start justify-between gap-3">
+                            <p className={`text-[13.5px] leading-snug ${!notification.isRead ? 'font-semibold text-ink' : 'font-medium text-ink-soft'}`}>
                               {notification.title}
                             </p>
-                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${priorityColors[notification.priority] || priorityColors.low}`}>
+                            <span className={`badge flex-shrink-0 capitalize ${priorityStyles[notification.priority] || priorityStyles.low}`}>
                               {notification.priority}
                             </span>
                           </div>
-                          <p className="text-[#94A3B8] text-[13px]">{notification.message}</p>
-                          <div className="flex items-center gap-3 mt-2">
-                            <span className="text-[#64748B] text-[11px]">{formatRelativeTime(notification.createdAt)}</span>
+
+                          <p className="t-xs mt-1 line-clamp-2 text-ink-soft">{notification.message}</p>
+
+                          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                            <span className="t-micro text-ink-faint">{formatRelativeTime(notification.createdAt)}</span>
                             {notification.plateNumber && (
-                              <span className="text-teal-500 text-[11px] font-medium">{notification.plateNumber}</span>
+                              <span className="mono rounded-[6px] border border-hairline bg-ghost px-1.5 py-0.5 text-[10.5px] font-medium text-ink-soft">
+                                {notification.plateNumber}
+                              </span>
                             )}
                             {notification.referenceNumber && (
-                              <span className="text-[#64748B] text-[11px] font-mono">{notification.referenceNumber}</span>
+                              <span className="mono text-[10.5px] text-ink-faint">{notification.referenceNumber}</span>
                             )}
                           </div>
                         </div>
-                        <div className="flex flex-col gap-1 flex-shrink-0">
+
+                        <div className="flex flex-shrink-0 flex-col gap-1">
                           {!notification.isRead && (
-                            <button onClick={(e) => { e.stopPropagation(); handleMarkAsRead(notification._id); }} className="text-teal-500 hover:text-teal-400 transition-colors duration-150" title="Mark as read">
-                              <HiOutlineCheck size={16} />
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleMarkAsRead(notification._id) }}
+                              className="btn btn-ghost btn-icon h-8 w-8 min-w-8"
+                              aria-label="Mark as read"
+                              title="Mark as read"
+                            >
+                              <HiOutlineCheck size={15} />
                             </button>
                           )}
-                          <button onClick={(e) => { e.stopPropagation(); handleDelete(notification._id); }} className="text-[#64748B] hover:text-danger transition-colors duration-150" title="Delete">
-                            <HiOutlineXMark size={16} />
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDelete(notification._id) }}
+                            className="btn btn-ghost btn-icon h-8 w-8 min-w-8 text-ink-faint"
+                            aria-label="Delete notification"
+                            title="Delete"
+                          >
+                            <HiOutlineXMark size={15} />
                           </button>
                         </div>
                       </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
-            </div>
+            </section>
           ))}
         </div>
       )}

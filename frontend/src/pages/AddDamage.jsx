@@ -3,10 +3,7 @@ import api from '../services/api'
 import { useToast } from '../components/Toast'
 import { formatCurrency } from '../utils/formatters'
 import {
-  HiOutlineTruck,
   HiOutlineCalendarDays,
-  HiOutlineCurrencyDollar,
-  HiOutlineWrenchScrewdriver,
   HiOutlineChevronDown,
   HiOutlineChevronUp,
   HiOutlineDocumentText,
@@ -25,13 +22,13 @@ const DAMAGE_TYPES = [
 const EXPENSE_TYPES = [
   { value: 'fuel', label: 'Fuel' },
   { value: 'repair', label: 'Repair' },
-  { value: 'oil_service', label: 'Oil Service' },
+  { value: 'oil_service', label: 'Oil service' },
   { value: 'tires', label: 'Tires' },
   { value: 'insurance', label: 'Insurance' },
   { value: 'inspection', label: 'Inspection' },
   { value: 'fine', label: 'Fine' },
   { value: 'parking', label: 'Parking' },
-  { value: 'car_wash', label: 'Car Wash' },
+  { value: 'car_wash', label: 'Car wash' },
   { value: 'maintenance', label: 'Maintenance' },
   { value: 'other', label: 'Other' },
 ]
@@ -115,147 +112,300 @@ export default function AddDamage() {
   }
 
   const closeSuccess = () => setSuccess(null)
-
-  const labelClass = 'text-[12px] text-[#64748B] uppercase tracking-widest font-semibold mb-2 block'
-  const inputClass = 'w-full bg-[#0B1120] text-white rounded-2xl px-4 h-[56px] border border-white/5 focus:border-teal-500 focus:outline-none text-[15px] transition-all duration-200'
   const displayedDamageTypes = showAllDamage ? DAMAGE_TYPES : DAMAGE_TYPES.slice(0, INITIAL_SHOWN)
 
   return (
-    <div className="page-enter max-w-lg mx-auto px-5 py-8">
-      <div className="mb-8">
-        <h1 className="text-[28px] font-bold text-white tracking-tight">Vehicle Health</h1>
-        <p className="text-[#94A3B8] text-[15px] mt-1">Manage damages and operating expenses</p>
+    <div className="page-enter mx-auto w-full max-w-3xl">
+      <div className="mb-7">
+        <h1 className="t-page">Vehicle health</h1>
+        <p className="t-sm mt-1 text-ink-soft">Manage damages and operating expenses.</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex bg-[#1A2332] rounded-2xl p-1.5 mb-6 border border-white/5">
-        <button onClick={() => setActiveTab('damage')} className={`flex-1 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${activeTab === 'damage' ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/15' : 'text-[#64748B]'}`}>
-          <HiOutlineExclamationTriangle size={18} />Damage
+      <div className="seg mb-5">
+        <button
+          onClick={() => setActiveTab('damage')}
+          className={`seg-item ${activeTab === 'damage' ? 'seg-item-active' : ''}`}
+        >
+          <HiOutlineExclamationTriangle size={16} />
+          Damage
         </button>
-        <button onClick={() => setActiveTab('expense')} className={`flex-1 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${activeTab === 'expense' ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/15' : 'text-[#64748B]'}`}>
-          <HiOutlineReceiptPercent size={18} />Expense
+        <button
+          onClick={() => setActiveTab('expense')}
+          className={`seg-item ${activeTab === 'expense' ? 'seg-item-active' : ''}`}
+        >
+          <HiOutlineReceiptPercent size={16} />
+          Expense
         </button>
       </div>
 
-      {/* Shared Fields */}
-      <div className="mb-5">
-        <label className={labelClass}>Select Vehicle</label>
-        <div className="relative">
-          <HiOutlineTruck size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-          <select value={activeTab === 'damage' ? damageForm.carId : expenseForm.carId} onChange={(e) => activeTab === 'damage' ? updateDamage('carId', e.target.value) : updateExpense('carId', e.target.value)} className="w-full bg-[#0B1120] text-white rounded-2xl pl-12 pr-4 h-[56px] border border-white/5 focus:border-teal-500 focus:outline-none text-[15px] appearance-none transition-all duration-200" required>
-            <option value="" className="bg-[#0B1120]">Choose a vehicle...</option>
-            {cars.map(car => <option key={car._id} value={car._id} className="bg-[#0B1120]">{car.plateNumber} — {car.driverName}</option>)}
-          </select>
-        </div>
-      </div>
+      {/* Shared fields */}
+      <div className="card mb-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="t-label mb-1.5 block">Vehicle</label>
+            <div className="select-wrap">
+              <select
+                value={activeTab === 'damage' ? damageForm.carId : expenseForm.carId}
+                onChange={(e) => activeTab === 'damage' ? updateDamage('carId', e.target.value) : updateExpense('carId', e.target.value)}
+                className="field appearance-none pr-10"
+                required
+              >
+                <option value="">Choose a vehicle</option>
+                {cars.map(car => <option key={car._id} value={car._id}>{car.plateNumber} — {car.driverName}</option>)}
+              </select>
+              <HiOutlineChevronDown size={16} />
+            </div>
+          </div>
 
-      <div className="mb-5">
-        <label className={labelClass}>Date</label>
-        <div className="relative">
-          <HiOutlineCalendarDays size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-          <input type="date" value={activeTab === 'damage' ? damageForm.date : expenseForm.date} onChange={(e) => activeTab === 'damage' ? updateDamage('date', e.target.value) : updateExpense('date', e.target.value)} className="w-full bg-[#0B1120] text-white rounded-2xl pl-12 pr-4 h-[56px] border border-white/5 focus:border-teal-500 focus:outline-none text-[15px] transition-all duration-200" required />
+          <div>
+            <label className="t-label mb-1.5 block">Date</label>
+            <div className="relative">
+              <HiOutlineCalendarDays
+                size={17}
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-faint"
+              />
+              <input
+                type="date"
+                value={activeTab === 'damage' ? damageForm.date : expenseForm.date}
+                onChange={(e) => activeTab === 'damage' ? updateDamage('date', e.target.value) : updateExpense('date', e.target.value)}
+                className="field pl-11"
+                required
+              />
+            </div>
+          </div>
         </div>
       </div>
 
       {activeTab === 'damage' ? (
-        <form onSubmit={handleDamageSubmit} className="space-y-5">
-          <div>
-            <label className={labelClass}>Damage Type</label>
-            <div className="grid grid-cols-2 gap-2.5">
-              {displayedDamageTypes.map(type => (
-                <button key={type} type="button" onClick={() => updateDamage('damageType', type)} className={`text-left px-3.5 py-3.5 rounded-2xl text-[13px] font-medium border transition-all duration-200 ${damageForm.damageType === type ? 'border-teal-500 bg-teal-500/10 text-teal-400' : 'border-white/5 bg-[#0B1120] text-[#94A3B8]'}`}>{type}</button>
-              ))}
+        <form onSubmit={handleDamageSubmit} className="space-y-4">
+          <div className="card">
+            <label className="t-label mb-3 block">Damage type</label>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {displayedDamageTypes.map(type => {
+                const active = damageForm.damageType === type
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => updateDamage('damageType', type)}
+                    aria-pressed={active}
+                    className={`rounded-[10px] border px-3 py-3 text-left text-[12.5px] leading-snug transition-colors duration-150 ${
+                      active
+                        ? 'border-[var(--solid)] bg-solid font-medium text-solid-ink'
+                        : 'border-hairline bg-field text-ink-soft hover:border-hairline-strong hover:text-ink'
+                    }`}
+                  >
+                    {type}
+                  </button>
+                )
+              })}
             </div>
             {DAMAGE_TYPES.length > INITIAL_SHOWN && (
-              <button type="button" onClick={() => setShowAllDamage(!showAllDamage)} className="mt-3 text-teal-500 text-[13px] font-medium flex items-center gap-1">
-                {showAllDamage ? <><HiOutlineChevronUp size={14} /> Show Less</> : <><HiOutlineChevronDown size={14} /> Show All ({DAMAGE_TYPES.length})</>}
+              <button
+                type="button"
+                onClick={() => setShowAllDamage(!showAllDamage)}
+                className="mt-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-ink-soft transition-colors hover:text-ink"
+              >
+                {showAllDamage
+                  ? <><HiOutlineChevronUp size={14} /> Show less</>
+                  : <><HiOutlineChevronDown size={14} /> Show all ({DAMAGE_TYPES.length})</>}
               </button>
             )}
           </div>
 
-          <div>
-            <label className={labelClass}>Estimated Repair Cost (KES)</label>
-            <div className="relative">
-              <HiOutlineCurrencyDollar size={22} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-              <input type="number" value={damageForm.estimatedCost} onChange={(e) => updateDamage('estimatedCost', e.target.value)} className="w-full bg-[#0B1120] text-white rounded-2xl pl-14 pr-4 h-[72px] border border-white/5 focus:border-teal-500 focus:outline-none text-4xl font-mono font-bold text-center transition-all duration-200" placeholder="0" required min="0" />
+          <div className="card">
+            <div className="mb-3 flex items-baseline justify-between">
+              <label className="t-label">Estimated repair cost</label>
+              <span className="t-micro text-ink-faint">KES</span>
+            </div>
+            <input
+              type="number"
+              value={damageForm.estimatedCost}
+              onChange={(e) => updateDamage('estimatedCost', e.target.value)}
+              className="field field-lg"
+              placeholder="0"
+              required
+              min="0"
+              aria-label="Estimated repair cost in KES"
+            />
+          </div>
+
+          <div className="card">
+            <label className="t-label mb-3 block">Driver at fault?</label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => updateDamage('driverAtFault', false)}
+                aria-pressed={!damageForm.driverAtFault}
+                className={`h-11 rounded-[10px] border text-[13px] font-medium transition-colors ${
+                  !damageForm.driverAtFault
+                    ? 'border-[var(--solid)] bg-solid text-solid-ink'
+                    : 'border-hairline bg-field text-ink-soft hover:border-hairline-strong'
+                }`}
+              >
+                No
+              </button>
+              <button
+                type="button"
+                onClick={() => updateDamage('driverAtFault', true)}
+                aria-pressed={damageForm.driverAtFault}
+                className={`h-11 rounded-[10px] border text-[13px] font-medium transition-colors ${
+                  damageForm.driverAtFault
+                    ? 'border-[var(--solid)] bg-solid text-solid-ink'
+                    : 'border-hairline bg-field text-ink-soft hover:border-hairline-strong'
+                }`}
+              >
+                Yes
+              </button>
             </div>
           </div>
 
-          <div>
-            <label className={labelClass}>Driver at Fault?</label>
-            <div className="flex gap-2">
-              <button type="button" onClick={() => updateDamage('driverAtFault', false)} className={`flex-1 py-3 rounded-2xl text-[14px] font-semibold border transition-all duration-200 ${!damageForm.driverAtFault ? 'border-teal-500 bg-teal-500/10 text-teal-400' : 'border-white/5 bg-[#0B1120] text-[#64748B]'}`}>No</button>
-              <button type="button" onClick={() => updateDamage('driverAtFault', true)} className={`flex-1 py-3 rounded-2xl text-[14px] font-semibold border transition-all duration-200 ${damageForm.driverAtFault ? 'border-danger bg-danger/10 text-danger' : 'border-white/5 bg-[#0B1120] text-[#64748B]'}`}>Yes</button>
-            </div>
+          <div className="card">
+            <label className="t-label mb-1.5 block">Note (optional)</label>
+            <textarea
+              value={damageForm.note}
+              onChange={(e) => updateDamage('note', e.target.value)}
+              className="field"
+              rows="2"
+              placeholder="Additional details..."
+            />
           </div>
 
-          <div>
-            <label className={labelClass}>Note (optional)</label>
-            <textarea value={damageForm.note} onChange={(e) => updateDamage('note', e.target.value)} className="w-full bg-[#0B1120] text-white rounded-2xl px-4 py-3.5 border border-white/5 focus:border-teal-500 focus:outline-none text-[15px] resize-none transition-all duration-200" rows="2" placeholder="Additional details..." />
-          </div>
-
-          <button type="submit" disabled={loading} className="w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-2xl h-[56px] text-[15px] transition-all duration-200 disabled:opacity-40 shadow-lg shadow-teal-500/15 ripple btn-press mt-8">
-            {loading ? 'Reporting...' : 'Report Damage'}
+          <button type="submit" disabled={loading} className="btn btn-primary btn-lg btn-block">
+            {loading ? 'Reporting...' : 'Report damage'}
           </button>
         </form>
       ) : (
-        <form onSubmit={handleExpenseSubmit} className="space-y-5">
-          <div>
-            <label className={labelClass}>Expense Category</label>
-            <div className="grid grid-cols-3 gap-2">
-              {EXPENSE_TYPES.map(t => (
-                <button key={t.value} type="button" onClick={() => updateExpense('type', t.value)} className={`py-3 px-2 rounded-2xl text-[12px] font-medium border transition-all duration-200 ${expenseForm.type === t.value ? 'border-teal-500 bg-teal-500/10 text-teal-400' : 'border-white/5 bg-[#0B1120] text-[#94A3B8]'}`}>{t.label}</button>
-              ))}
+        <form onSubmit={handleExpenseSubmit} className="space-y-4">
+          <div className="card">
+            <label className="t-label mb-3 block">Expense category</label>
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+              {EXPENSE_TYPES.map(t => {
+                const active = expenseForm.type === t.value
+                return (
+                  <button
+                    key={t.value}
+                    type="button"
+                    onClick={() => updateExpense('type', t.value)}
+                    aria-pressed={active}
+                    className={`h-10 rounded-[10px] border px-2 text-[12px] font-medium transition-colors duration-150 ${
+                      active
+                        ? 'border-[var(--solid)] bg-solid text-solid-ink'
+                        : 'border-hairline bg-field text-ink-soft hover:border-hairline-strong hover:text-ink'
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                )
+              })}
             </div>
           </div>
 
-          <div>
-            <label className={labelClass}>Description</label>
+          <div className="card">
+            <label className="t-label mb-1.5 block">Description</label>
             <div className="relative">
-              <HiOutlineDocumentText size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-              <input type="text" value={expenseForm.description} onChange={(e) => updateExpense('description', e.target.value)} className={inputClass + ' pl-12'} placeholder="e.g., Full tank refill" />
+              <HiOutlineDocumentText
+                size={17}
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-faint"
+              />
+              <input
+                type="text"
+                value={expenseForm.description}
+                onChange={(e) => updateExpense('description', e.target.value)}
+                className="field pl-11"
+                placeholder="e.g., Full tank refill"
+              />
             </div>
           </div>
 
-          <div>
-            <label className={labelClass}>Cost (KES)</label>
-            <div className="relative">
-              <HiOutlineCurrencyDollar size={22} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-              <input type="number" value={expenseForm.cost} onChange={(e) => updateExpense('cost', e.target.value)} className="w-full bg-[#0B1120] text-white rounded-2xl pl-14 pr-4 h-[72px] border border-white/5 focus:border-teal-500 focus:outline-none text-4xl font-mono font-bold text-center transition-all duration-200" placeholder="0" required min="0" />
+          <div className="card">
+            <div className="mb-3 flex items-baseline justify-between">
+              <label className="t-label">Cost</label>
+              <span className="t-micro text-ink-faint">KES</span>
             </div>
+            <input
+              type="number"
+              value={expenseForm.cost}
+              onChange={(e) => updateExpense('cost', e.target.value)}
+              className="field field-lg"
+              placeholder="0"
+              required
+              min="0"
+              aria-label="Expense cost in KES"
+            />
           </div>
 
-          <div>
-            <label className={labelClass}>Note (optional)</label>
-            <textarea value={expenseForm.note} onChange={(e) => updateExpense('note', e.target.value)} className="w-full bg-[#0B1120] text-white rounded-2xl px-4 py-3.5 border border-white/5 focus:border-teal-500 focus:outline-none text-[15px] resize-none transition-all duration-200" rows="2" placeholder="Additional details..." />
+          <div className="card">
+            <label className="t-label mb-1.5 block">Note (optional)</label>
+            <textarea
+              value={expenseForm.note}
+              onChange={(e) => updateExpense('note', e.target.value)}
+              className="field"
+              rows="2"
+              placeholder="Additional details..."
+            />
           </div>
 
-          <button type="submit" disabled={loading} className="w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-2xl h-[56px] text-[15px] transition-all duration-200 disabled:opacity-40 shadow-lg shadow-teal-500/15 ripple btn-press mt-8">
-            {loading ? 'Saving...' : 'Record Expense'}
+          <button type="submit" disabled={loading} className="btn btn-primary btn-lg btn-block">
+            {loading ? 'Saving...' : 'Record expense'}
           </button>
         </form>
       )}
 
-      {/* Success Modal */}
+      {/* Success receipt */}
       {success && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={closeSuccess}>
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <div className="relative bg-[#1A2332] rounded-2xl w-full max-w-sm p-8 shadow-2xl border border-white/5 text-center" onClick={(e) => e.stopPropagation()}>
-            <button onClick={closeSuccess} className="absolute top-4 right-4 text-[#64748B] hover:text-white transition-colors duration-150"><HiOutlineXMark size={20} /></button>
-            <div className="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-5">
-              <HiOutlineCheckCircle size={44} className="text-success" />
+          <div className="backdrop backdrop-enter" />
+          <div
+            className="modal sheet-enter"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label={success.type === 'damage' ? 'Damage reported' : 'Expense added'}
+          >
+            <button
+              onClick={closeSuccess}
+              aria-label="Close"
+              className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-[8px] text-ink-faint transition-colors hover:bg-ghost hover:text-ink"
+            >
+              <HiOutlineXMark size={18} />
+            </button>
+
+            <div className="text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-panel-soft">
+                <HiOutlineCheckCircle size={30} className="text-ink" />
+              </div>
+              <h2 className="t-section">{success.type === 'damage' ? 'Damage reported' : 'Expense added'}</h2>
+              <p className="figure-lg mt-3 break-words text-[30px]">{formatCurrency(success.amount)}</p>
+
+              <div className="mt-6 rounded-[12px] border border-hairline bg-canvas-soft p-4 text-left">
+                <div className="flex justify-between gap-4 py-2">
+                  <span className="t-xs text-ink-faint">Vehicle</span>
+                  <span className="mono text-[13px] font-medium">{success.plateNumber}</span>
+                </div>
+                <div className="flex justify-between gap-4 border-t border-hairline py-2">
+                  <span className="t-xs text-ink-faint">Reference</span>
+                  <span className="mono text-[12.5px] font-medium">{success.referenceNumber}</span>
+                </div>
+                <div className="flex justify-between gap-4 border-t border-hairline py-2">
+                  <span className="t-xs text-ink-faint">Date</span>
+                  <span className="text-[13px]">{success.date}</span>
+                </div>
+                <div className="flex justify-between gap-4 border-t border-hairline py-2">
+                  <span className="t-xs text-ink-faint">Time</span>
+                  <span className="mono text-[13px]">{success.time}</span>
+                </div>
+              </div>
             </div>
-            <h2 className="text-[22px] font-bold text-white mb-1">{success.type === 'damage' ? 'Damage Reported!' : 'Expense Added!'}</h2>
-            <p className="text-3xl font-mono font-bold text-success mb-6">{formatCurrency(success.amount)}</p>
-            <div className="bg-[#0B1120] rounded-2xl p-4 space-y-3 mb-6 text-left">
-              <div className="flex justify-between"><span className="text-[#64748B] text-[13px]">Vehicle</span><span className="text-white text-[13px] font-medium">{success.plateNumber}</span></div>
-              <div className="flex justify-between"><span className="text-[#64748B] text-[13px]">Reference</span><span className="text-teal-400 text-[13px] font-mono font-medium">{success.referenceNumber}</span></div>
-              <div className="flex justify-between"><span className="text-[#64748B] text-[13px]">Date</span><span className="text-white text-[13px]">{success.date}</span></div>
-              <div className="flex justify-between"><span className="text-[#64748B] text-[13px]">Time</span><span className="text-white text-[13px]">{success.time}</span></div>
-            </div>
-            <div className="flex gap-3">
-              <button onClick={closeSuccess} className="flex-1 bg-white/5 hover:bg-white/10 text-white rounded-2xl h-[52px] font-medium text-[14px] transition-all duration-200">Add Another</button>
-              <button onClick={closeSuccess} className="flex-1 bg-teal-500 hover:bg-teal-600 text-white rounded-2xl h-[52px] font-semibold text-[14px] transition-all duration-200 shadow-lg shadow-teal-500/15">Done</button>
+
+            <div className="mt-5 flex gap-2.5">
+              <button onClick={closeSuccess} className="btn btn-secondary flex-1">
+                Add another
+              </button>
+              <button onClick={closeSuccess} className="btn btn-primary flex-1">
+                Done
+              </button>
             </div>
           </div>
         </div>

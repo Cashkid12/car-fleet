@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import { useToast } from '../components/Toast'
 import { formatCurrency } from '../utils/formatters'
-import LoadingSpinner from '../components/LoadingSpinner'
 import EmptyState from '../components/EmptyState'
 import {
   HiOutlinePencilSquare,
@@ -14,15 +13,18 @@ import {
   HiOutlineTruck,
   HiOutlineMagnifyingGlass,
   HiOutlineXMark,
-  HiOutlineChevronRight
+  HiOutlineEllipsisHorizontal,
+  HiOutlineArrowUpRight,
+  HiOutlineCheckCircle,
+  HiOutlineExclamationTriangle
 } from 'react-icons/hi2'
 
 const FILTERS = [
   { key: 'all', label: 'All' },
   { key: 'healthy', label: 'Healthy' },
   { key: 'damaged', label: 'Damaged' },
-  { key: 'profit_high', label: 'Highest Profit' },
-  { key: 'profit_low', label: 'Lowest Profit' },
+  { key: 'profit_high', label: 'Highest profit' },
+  { key: 'profit_low', label: 'Lowest profit' },
 ]
 
 export default function Cars() {
@@ -35,6 +37,7 @@ export default function Cars() {
   const [deleteConfirm, setDeleteConfirm] = useState(null)
   const [search, setSearch] = useState('')
   const [activeFilter, setActiveFilter] = useState('all')
+  const [menuOpen, setMenuOpen] = useState(null)
   const { addToast } = useToast()
   const navigate = useNavigate()
 
@@ -106,9 +109,6 @@ export default function Cars() {
     }
   }
 
-  const formInputClass = 'w-full bg-[#0B1120] text-white rounded-2xl pl-12 pr-4 h-[56px] border border-white/5 focus:border-teal-500 focus:outline-none text-[15px] transition-all duration-200'
-  const labelClass = 'text-[12px] text-[#64748B] uppercase tracking-widest font-semibold mb-2 block'
-
   const totalCars = cars.length
   const healthyCars = cars.filter(c => c.status === 'healthy').length
   const damagedCars = cars.filter(c => c.status === 'damaged').length
@@ -116,217 +116,328 @@ export default function Cars() {
 
   if (loading) {
     return (
-      <div className="py-8">
-        <div className="skeleton h-10 w-32 rounded-2xl mb-2" />
-        <div className="skeleton h-5 w-56 rounded-xl mb-6" />
-        <div className="skeleton h-12 w-full rounded-2xl mb-6" />
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          {[1, 2, 3, 4].map(i => <div key={i} className="skeleton h-[88px] rounded-2xl" />)}
+      <div className="py-2">
+        <div className="skeleton mb-2 h-9 w-40" />
+        <div className="skeleton mb-6 h-4 w-64" />
+        <div className="skeleton mb-4 h-12 w-full" />
+        <div className="mb-6 flex gap-2">
+          {[1, 2, 3, 4].map(i => <div key={i} className="skeleton h-9 w-24 rounded-full" />)}
         </div>
-        {[1, 2, 3].map(i => <div key={i} className="skeleton h-48 rounded-2xl mb-3" />)}
+        <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+          {[1, 2, 3, 4].map(i => <div key={i} className="skeleton h-24" />)}
+        </div>
+        <div className="grid gap-3 md:grid-cols-2">
+          {[1, 2, 3, 4].map(i => <div key={i} className="skeleton h-56" />)}
+        </div>
       </div>
     )
   }
 
+  const summary = [
+    { label: 'Total vehicles', value: String(totalCars) },
+    { label: 'Fleet profit', value: formatCurrency(totalProfit) },
+    { label: 'Healthy', value: String(healthyCars) },
+    { label: 'Damaged', value: String(damagedCars) },
+  ]
+
   return (
     <div className="page-enter">
       {/* Header */}
-      <div className="flex items-center justify-between mb-1">
+      <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-[28px] font-bold text-white tracking-tight">My Fleet</h1>
-          <p className="text-[#94A3B8] text-[15px] mt-1">Manage all your vehicles in one place.</p>
+          <h1 className="t-page">My Fleet</h1>
+          <p className="t-sm mt-1 text-ink-soft">Manage all your vehicles in one place.</p>
         </div>
         <button
           onClick={() => { resetForm(); setShowForm(true) }}
-          className="bg-gradient-to-br from-teal-500 to-teal-600 text-white font-semibold rounded-2xl h-[48px] px-5 text-[14px] flex items-center gap-2 shadow-lg shadow-teal-500/20 ripple btn-press flex-shrink-0"
+          className="btn btn-primary hidden sm:inline-flex"
         >
-          <HiOutlinePlus size={18} strokeWidth={2.5} />
-          Add Car
+          <HiOutlinePlus size={17} strokeWidth={2} />
+          Add vehicle
         </button>
       </div>
 
-      {/* Search Bar */}
-      <div className="relative mb-4 mt-6">
-        <HiOutlineMagnifyingGlass size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by plate number or driver name..."
-          className="w-full bg-[#1A2332] text-white rounded-2xl pl-12 pr-12 h-[56px] border border-white/5 focus:border-teal-500 focus:outline-none text-[15px] placeholder-[#64748B] transition-all duration-200"
-        />
-        {search && (
-          <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-white transition-colors duration-150">
-            <HiOutlineXMark size={18} />
-          </button>
-        )}
+      {/* Search */}
+      <div className="mb-4 flex gap-2">
+        <div className="relative flex-1">
+          <HiOutlineMagnifyingGlass
+            size={18}
+            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-faint"
+          />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search plate number or driver"
+            className="field pl-11 pr-11"
+            aria-label="Search vehicles"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch('')}
+              aria-label="Clear search"
+              className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-[8px] text-ink-faint transition-colors hover:bg-ghost hover:text-ink"
+            >
+              <HiOutlineXMark size={17} />
+            </button>
+          )}
+        </div>
+        <button
+          onClick={() => { resetForm(); setShowForm(true) }}
+          className="btn btn-primary sm:hidden"
+          aria-label="Add vehicle"
+        >
+          <HiOutlinePlus size={18} strokeWidth={2} />
+        </button>
       </div>
 
-      {/* Filter Pills */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
+      {/* Filters */}
+      <div className="no-scrollbar -mx-4 mb-6 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
         {FILTERS.map(filter => (
           <button
             key={filter.key}
             onClick={() => setActiveFilter(filter.key)}
-            className={`flex-shrink-0 px-4 py-2.5 rounded-full text-[13px] font-semibold transition-all duration-200 ${
-              activeFilter === filter.key ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/20' : 'bg-[#1A2332] text-[#94A3B8] border border-white/5'
-            }`}
+            className={`pill ${activeFilter === filter.key ? 'pill-active' : ''}`}
           >
             {filter.label}
           </button>
         ))}
       </div>
 
-      {/* Fleet Summary */}
-      {cars.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="bg-[#1A2332] rounded-2xl p-4 border border-white/5 text-center">
-            <p className="text-[11px] text-[#64748B] uppercase tracking-widest font-semibold mb-1">Total Cars</p>
-            <p className="text-white text-xl font-bold">{totalCars}</p>
+      {/* Summary strip */}
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+        {summary.map((item) => (
+          <div key={item.label} className="card p-4">
+            <p className="t-label">{item.label}</p>
+            <p className={`mt-2 ${item.label === 'Fleet profit' ? 'figure text-[18px]' : 'figure text-[21px]'}`}>
+              {item.value}
+            </p>
           </div>
-          <div className="bg-[#1A2332] rounded-2xl p-4 border border-white/5 text-center">
-            <p className="text-[11px] text-[#64748B] uppercase tracking-widest font-semibold mb-1">Fleet Profit</p>
-            <p className={`text-xl font-bold font-mono ${totalProfit >= 0 ? 'text-success' : 'text-danger'}`}>{formatCurrency(totalProfit)}</p>
-          </div>
-          <div className="bg-[#1A2332] rounded-2xl p-4 border border-white/5 text-center">
-            <p className="text-[11px] text-[#64748B] uppercase tracking-widest font-semibold mb-1">Healthy</p>
-            <p className="text-success text-xl font-bold">{healthyCars}</p>
-          </div>
-          <div className="bg-[#1A2332] rounded-2xl p-4 border border-white/5 text-center">
-            <p className="text-[11px] text-[#64748B] uppercase tracking-widest font-semibold mb-1">Damaged</p>
-            <p className={`text-xl font-bold ${damagedCars > 0 ? 'text-danger' : 'text-[#64748B]'}`}>{damagedCars}</p>
-          </div>
-        </div>
-      )}
+        ))}
+      </div>
 
-      {/* Empty State */}
+      {/* Empty state */}
       {cars.length === 0 ? (
-        <EmptyState
-          icon={<HiOutlineTruck size={40} className="text-[#64748B] opacity-20" />}
-          title="No Vehicles Yet"
-          description="Start building your fleet by adding your first vehicle."
-          actionLabel="Add Your First Car"
-          onAction={() => { resetForm(); setShowForm(true) }}
-        />
+        <div className="card p-0">
+          <EmptyState
+            icon={<HiOutlineTruck size={26} />}
+            title="No vehicles yet"
+            description="Start building your fleet by adding your first vehicle."
+            actionLabel="Add your first car"
+            onAction={() => { resetForm(); setShowForm(true) }}
+          />
+        </div>
       ) : (
-        <div className="space-y-3">
-          {cars.map((car, index) => (
-            <div
-              key={car._id}
-              className="bg-[#1A2332] rounded-2xl p-5 border border-white/5 shadow-lg shadow-black/10 card-lift list-item-enter"
-              style={{ animationDelay: `${index * 60}ms` }}
-            >
-              <div className="flex items-start gap-4 mb-4">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${car.status === 'healthy' ? 'bg-success/10' : 'bg-danger/10'}`}>
-                  <HiOutlineTruck size={24} className={car.status === 'healthy' ? 'text-success' : 'text-danger'} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="text-[18px] font-mono font-bold text-white tracking-wide">{car.plateNumber}</h3>
-                    <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1 rounded-full flex-shrink-0 ${car.status === 'healthy' ? 'bg-[#065F46] text-success' : 'bg-[#7F1D1D] text-danger'}`}>
-                      <span className={`w-2 h-2 rounded-full ${car.status === 'damaged' ? 'animate-pulse' : ''} ${car.status === 'healthy' ? 'bg-success' : 'bg-danger'}`} />
-                      {car.status === 'healthy' ? 'Healthy' : 'Damaged'}
-                    </span>
-                  </div>
-                  <p className="text-[#94A3B8] text-[13px]">{car.driverName}</p>
-                  <div className="flex items-center gap-x-3 gap-y-1 text-[#64748B] text-[12px] mt-1 flex-wrap">
-                    <span className="flex items-center gap-1"><HiOutlinePhone size={12} />{car.driverPhone}</span>
-                    <span className="flex items-center gap-1"><HiOutlineUsers size={12} />{car.passengerCapacity} pass.</span>
-                  </div>
-                </div>
-              </div>
+        <div className="grid gap-3 md:grid-cols-2 md:gap-4">
+          {cars.map((car, index) => {
+            const healthy = car.status === 'healthy'
+            return (
+              <div
+                key={car._id}
+                className="card list-item-enter p-4 sm:p-5"
+                style={{ animationDelay: `${index * 40}ms` }}
+              >
+                <div className="flex items-start gap-3">
+                  <span className="tile tile-lg">
+                    <HiOutlineTruck size={21} />
+                  </span>
 
-              <div className="flex justify-between py-4 border-y border-white/5 mb-4">
-                <div className="text-center flex-1">
-                  <p className="text-[#64748B] text-[10px] uppercase tracking-widest mb-1">Income</p>
-                  <p className="text-white font-semibold text-[14px] tabular-nums">{formatCurrency(car.incomeThisMonth || 0)}</p>
-                </div>
-                <div className="text-center flex-1 border-l border-white/5">
-                  <p className="text-[#64748B] text-[10px] uppercase tracking-widest mb-1">Expenses</p>
-                  <p className="text-white font-semibold text-[14px] tabular-nums">{formatCurrency(car.expensesThisMonth || 0)}</p>
-                </div>
-                <div className="text-center flex-1 border-l border-white/5">
-                  <p className="text-[#64748B] text-[10px] uppercase tracking-widest mb-1">Profit</p>
-                  <p className={`font-semibold text-[14px] tabular-nums ${(car.profitThisMonth || 0) >= 0 ? 'text-success' : 'text-danger'}`}>{formatCurrency(car.profitThisMonth || 0)}</p>
-                </div>
-              </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="plate">{car.plateNumber}</h3>
+                      <span className={`badge ${healthy ? 'badge-subtle' : 'badge-outline'}`}>
+                        {healthy
+                          ? <HiOutlineCheckCircle size={12} />
+                          : <HiOutlineExclamationTriangle size={12} />}
+                        {healthy ? 'Healthy' : 'Damaged'}
+                      </span>
+                    </div>
+                    <p className="t-sm mt-1.5 truncate font-medium text-ink">{car.driverName}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-ink-faint">
+                      <span className="t-xs inline-flex items-center gap-1">
+                        <HiOutlinePhone size={12} />{car.driverPhone}
+                      </span>
+                      <span className="t-xs inline-flex items-center gap-1">
+                        <HiOutlineUsers size={12} />{car.passengerCapacity} passengers
+                      </span>
+                    </div>
+                  </div>
 
-              <div className="flex gap-2">
-                <button onClick={() => navigate(`/cars/${car._id}`)} className="flex-1 bg-teal-500/10 text-teal-500 rounded-2xl h-[44px] text-[13px] font-semibold flex items-center justify-center gap-1.5 hover:bg-teal-500/20 transition-all duration-200">
-                  View Details <HiOutlineChevronRight size={14} />
-                </button>
-                <button onClick={() => handleEdit(car)} className="flex-1 bg-white/5 text-[#94A3B8] rounded-2xl h-[44px] text-[13px] font-semibold flex items-center justify-center gap-1.5 hover:bg-white/10 hover:text-white transition-all duration-200">
-                  <HiOutlinePencilSquare size={15} /> Edit
-                </button>
-                <button onClick={() => setDeleteConfirm(car)} className="flex-1 bg-white/5 text-[#94A3B8] rounded-2xl h-[44px] text-[13px] font-semibold flex items-center justify-center gap-1.5 hover:bg-red-500/10 hover:text-danger transition-all duration-200">
-                  <HiOutlineTrash size={15} /> Delete
+                  {/* Contextual actions */}
+                  <div className="relative flex-shrink-0">
+                    <button
+                      onClick={() => setMenuOpen(menuOpen === car._id ? null : car._id)}
+                      className="btn btn-ghost btn-icon"
+                      aria-label={`Actions for ${car.plateNumber}`}
+                      aria-expanded={menuOpen === car._id}
+                    >
+                      <HiOutlineEllipsisHorizontal size={19} />
+                    </button>
+
+                    {menuOpen === car._id && (
+                      <>
+                        <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(null)} />
+                        <div className="absolute right-0 top-11 z-30 w-44 overflow-hidden rounded-[12px] border border-hairline bg-panel py-1 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.55)]">
+                          <button
+                            onClick={() => { setMenuOpen(null); handleEdit(car) }}
+                            className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] text-ink-soft transition-colors hover:bg-ghost hover:text-ink"
+                          >
+                            <HiOutlinePencilSquare size={16} />
+                            Edit vehicle
+                          </button>
+                          <button
+                            onClick={() => { setMenuOpen(null); setDeleteConfirm(car) }}
+                            className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-ghost"
+                          >
+                            <HiOutlineTrash size={16} />
+                            Delete vehicle
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Financial strip */}
+                <div className="mt-4 grid grid-cols-3 gap-2 border-y border-hairline py-3">
+                  <div>
+                    <p className="t-label text-[9.5px]">Income</p>
+                    <p className="figure-sm mt-1">{formatCurrency(car.incomeThisMonth || 0)}</p>
+                  </div>
+                  <div className="border-l border-hairline pl-3">
+                    <p className="t-label text-[9.5px]">Expenses</p>
+                    <p className="figure-sm mt-1">{formatCurrency(car.expensesThisMonth || 0)}</p>
+                  </div>
+                  <div className="border-l border-hairline pl-3">
+                    <p className="t-label text-[9.5px]">Profit</p>
+                    <p className={`figure-sm mt-1 ${(car.profitThisMonth || 0) < 0 ? 'text-ink-soft' : 'text-ink'}`}>
+                      {formatCurrency(car.profitThisMonth || 0)}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => navigate(`/cars/${car._id}`)}
+                  className="btn btn-secondary btn-sm mt-3 w-full"
+                >
+                  View details
+                  <HiOutlineArrowUpRight size={15} />
                 </button>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
-      {/* FAB */}
+      {/* FAB (mobile) */}
       <button
         onClick={() => { resetForm(); setShowForm(true) }}
-        className="fixed bottom-28 right-5 z-40 w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center shadow-2xl shadow-teal-500/30 fab-glow ripple btn-press lg:hidden"
+        className="fixed bottom-[88px] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full border border-hairline-strong bg-solid text-solid-ink shadow-[0_12px_30px_-12px_rgba(0,0,0,0.55)] transition-transform active:scale-95 md:hidden"
+        aria-label="Add vehicle"
       >
-        <HiOutlinePlus size={26} strokeWidth={2.5} className="text-white" />
+        <HiOutlinePlus size={24} strokeWidth={2} />
       </button>
 
-      {/* Bottom Sheet Modal */}
+      {/* Add / edit sheet */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={resetForm}>
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm backdrop-enter" />
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center md:items-center md:p-6"
+          onClick={resetForm}
+        >
+          <div className="backdrop backdrop-enter" />
           <div
-            className="relative bg-[#1A2332] rounded-t-[24px] w-full max-w-[480px] p-6 max-h-[80vh] overflow-y-auto sheet-enter border border-white/5"
+            className="sheet sheet-enter p-5 sm:p-6"
             onClick={(e) => e.stopPropagation()}
-            style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))' }}
+            style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={editingCar ? 'Edit vehicle' : 'Add vehicle'}
           >
-            <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-6" />
+            <div className="grabber mb-5 md:hidden" />
 
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-[20px] font-semibold text-white">{editingCar ? 'Edit Vehicle' : 'Add New Vehicle'}</h3>
-              <button type="button" onClick={resetForm} className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-[#94A3B8] hover:text-white hover:bg-white/10 transition-all duration-200">
+            <div className="mb-6 flex items-start justify-between gap-3">
+              <div>
+                <h3 className="t-section">{editingCar ? 'Edit vehicle' : 'Add vehicle'}</h3>
+                <p className="t-xs mt-1 text-ink-faint">
+                  {editingCar ? 'Update the vehicle and driver details.' : 'Register a new vehicle and its driver.'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={resetForm}
+                className="btn btn-ghost btn-icon"
+                aria-label="Close"
+              >
                 <HiOutlineXMark size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className={labelClass}>Plate Number</label>
-                <div className="relative">
-                  <HiOutlineTruck size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-                  <input type="text" value={form.plateNumber} onChange={(e) => setForm(prev => ({ ...prev, plateNumber: e.target.value.toUpperCase() }))} className={formInputClass} placeholder="KDA 123T" required autoFocus />
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="t-label mb-1.5 block">Plate number</label>
+                  <input
+                    type="text"
+                    value={form.plateNumber}
+                    onChange={(e) => setForm(prev => ({ ...prev, plateNumber: e.target.value.toUpperCase() }))}
+                    className="field mono"
+                    placeholder="KDA 123T"
+                    required
+                    autoFocus
+                  />
                 </div>
-              </div>
-              <div>
-                <label className={labelClass}>Passenger Capacity</label>
-                <div className="relative">
-                  <HiOutlineUsers size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-                  <input type="number" value={form.passengerCapacity} onChange={(e) => setForm(prev => ({ ...prev, passengerCapacity: e.target.value }))} className={formInputClass} placeholder="11" required min="1" />
-                </div>
-              </div>
-              <div>
-                <label className={labelClass}>Driver Name</label>
-                <div className="relative">
-                  <HiOutlinePencilSquare size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-                  <input type="text" value={form.driverName} onChange={(e) => setForm(prev => ({ ...prev, driverName: e.target.value }))} className={formInputClass} placeholder="Driver name" required />
-                </div>
-              </div>
-              <div>
-                <label className={labelClass}>Driver Phone</label>
-                <div className="relative">
-                  <HiOutlinePhone size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] pointer-events-none" />
-                  <input type="tel" value={form.driverPhone} onChange={(e) => setForm(prev => ({ ...prev, driverPhone: e.target.value }))} className={formInputClass} placeholder="+254 712 345678" required />
+                <div>
+                  <label className="t-label mb-1.5 block">Passenger capacity</label>
+                  <input
+                    type="number"
+                    value={form.passengerCapacity}
+                    onChange={(e) => setForm(prev => ({ ...prev, passengerCapacity: e.target.value }))}
+                    className="field mono"
+                    placeholder="11"
+                    required
+                    min="1"
+                  />
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-2 pb-4">
-                <button type="button" onClick={resetForm} className="flex-1 bg-white/5 hover:bg-white/10 text-white rounded-2xl h-[56px] font-medium text-[15px] transition-all duration-200">Cancel</button>
-                <button type="submit" disabled={saving} className="flex-1 bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-2xl h-[56px] font-semibold text-[15px] transition-all duration-200 disabled:opacity-40 shadow-lg shadow-teal-500/20 ripple btn-press">
-                  {saving ? 'Saving...' : editingCar ? 'Update Vehicle' : 'Add Vehicle'}
+              <div>
+                <label className="t-label mb-1.5 block">Driver name</label>
+                <input
+                  type="text"
+                  value={form.driverName}
+                  onChange={(e) => setForm(prev => ({ ...prev, driverName: e.target.value }))}
+                  className="field"
+                  placeholder="Full name"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="t-label mb-1.5 block">Driver phone</label>
+                <input
+                  type="tel"
+                  value={form.driverPhone}
+                  onChange={(e) => setForm(prev => ({ ...prev, driverPhone: e.target.value }))}
+                  className="field mono"
+                  placeholder="+254 712 345678"
+                  required
+                />
+              </div>
+
+              <div className="flex gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="btn btn-secondary flex-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="btn btn-primary flex-1"
+                >
+                  {saving ? 'Saving...' : editingCar ? 'Save changes' : 'Add vehicle'}
                 </button>
               </div>
             </form>
@@ -334,19 +445,41 @@ export default function Cars() {
         </div>
       )}
 
-      {/* Delete Confirmation */}
+      {/* Delete confirmation */}
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={() => setDeleteConfirm(null)}>
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm backdrop-enter" />
-          <div className="relative bg-[#1A2332] rounded-2xl w-full max-w-sm p-6 shadow-2xl border border-white/5 sheet-enter" onClick={(e) => e.stopPropagation()}>
-            <div className="w-14 h-14 bg-danger/10 rounded-2xl flex items-center justify-center mb-4 mx-auto">
-              <HiOutlineTrash size={26} className="text-danger" />
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          onClick={() => setDeleteConfirm(null)}
+        >
+          <div className="backdrop backdrop-enter" />
+          <div
+            className="modal sheet-enter"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Delete vehicle"
+          >
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-hairline bg-panel-soft">
+              <HiOutlineTrash size={22} className="text-ink" />
             </div>
-            <h3 className="text-[20px] font-semibold text-white text-center mb-2">Delete Vehicle?</h3>
-            <p className="text-[#94A3B8] text-[14px] text-center mb-6">Are you sure you want to delete <strong className="text-white">{deleteConfirm.plateNumber}</strong>?<br />This cannot be undone. History will be preserved.</p>
-            <div className="flex gap-3">
-              <button onClick={() => setDeleteConfirm(null)} className="flex-1 bg-white/5 hover:bg-white/10 text-white rounded-2xl h-[52px] font-medium text-[15px] transition-all duration-200">Cancel</button>
-              <button onClick={() => handleDelete(deleteConfirm._id)} className="flex-1 bg-danger hover:bg-red-600 text-white rounded-2xl h-[52px] font-semibold text-[15px] transition-all duration-200 shadow-lg shadow-red-500/15">Delete</button>
+            <h3 className="t-section text-center">Delete vehicle?</h3>
+            <p className="t-sm mt-2 text-center text-ink-soft">
+              <strong className="mono font-semibold text-ink">{deleteConfirm.plateNumber}</strong> will be
+              removed from your fleet. This cannot be undone. History will be preserved.
+            </p>
+            <div className="mt-6 flex gap-2.5">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="btn btn-secondary flex-1"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirm._id)}
+                className="btn btn-primary flex-1"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
